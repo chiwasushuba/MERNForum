@@ -8,11 +8,17 @@ import { motion } from 'framer-motion'
 import Link from 'next/link';
 import React, { useState } from 'react';
 import {useLogin} from '@/hooks/useLogin'
+import { useLogout } from '@/hooks/useLogout';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const {login, error ,isLoading} = useLogin()
+  const {logout} = useLogout();
+
+  const handleLogout = () =>{
+    logout()
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,8 +29,10 @@ const Login = () => {
 
     setUsername('');
     setPassword('');
-    alert("User created successfully!"); // Or redirect user, etc.
+    alert("User logged in successfully!"); // Or redirect user, etc.
   };
+
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4">
@@ -36,7 +44,7 @@ const Login = () => {
       >
         <div className="bg-card dark:border-2 dark:border-secondary rounded-2xl shadow-xl p-8 space-y-6">
           <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold tracking-tighter">Sign-up</h1>
+            <h1 className="text-3xl font-bold tracking-tighter">Login</h1>
             <p className="text-muted-foreground">Enter your credentials to register an account</p>
           </div>
 
@@ -68,6 +76,9 @@ const Login = () => {
                 >
                   <EyeOff size={20} />
                 </button>
+                <Button onClick={handleLogout} variant={'outline'}>
+                  Logout
+                </Button>
               </div>
             </div>
 
