@@ -6,16 +6,24 @@ import RightSideBar from "@/components/RightSideBar";
 import { Separator } from "@/components/ui/separator";
 import { usePostsContext } from "@/hooks/usePostsContext";
 import { useEffect } from "react";
-  
+import { useAuthContext } from "@/hooks/useAuthContext";  
+
+
+
 export default function Home() {
 
   let contentVar = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean posuere metus vitae ex maximus, quis consectetur metus lacinia. Sed bibendum, metus sit amet venenatis aliquet, ante diam ornare ante, in semper est nisi quis urna. Nulla facilisi. Aliquam lacus nisl, imperdiet eget faucibus sit amet, ornare mattis diam. Vivamus mollis ligula sit amet dolor tristique finibus. Suspendisse ac condimentum diam. Proin quis mi odio. In neque nulla, pretium a ultricies id, ultrices in eros. Etiam eget ante non velit molestie dictum. Integer ultricies, nisl ut sagittis fermentum, nisi tortor consectetur nisi, vel fermentum neque tellus nec lorem. Mauris et mauris justo. Quisque tempus magna vitae imperdiet ultricies. ";
 
   const {posts, dispatch} = usePostsContext();
+  const {user} = useAuthContext();
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const response = await fetch("http://localhost:4000/api/post/");
+      const response = await fetch("http://localhost:4000/api/post/", {
+        headers:{
+          "Authorization": `Bearer ${user.token}`
+        }
+      });
       const json = await response.json()
 
       if (response.ok) {
@@ -26,8 +34,12 @@ export default function Home() {
       }
     }
 
-    fetchPosts();
-  }, [dispatch]);
+    if(user){
+      fetchPosts();
+    }
+
+    
+  }, [dispatch, user]);
 
   console.log(posts);
 
