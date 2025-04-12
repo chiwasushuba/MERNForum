@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { usePostsContext } from "@/hooks/usePostsContext";
 import { useEffect } from "react";
 import { useAuthContext } from "@/hooks/useAuthContext";  
+import AddPostButton from "@/components/AddPostButton";
 
 
 
@@ -63,7 +64,9 @@ export default function Home() {
                 content={post.content}
               />
             ))}
-
+            <div className="fixed bottom-5 right-75">
+              <AddPostButton />
+            </div>
           </div>
         </div>
       </div>

@@ -1,16 +1,9 @@
 import React from 'react'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
-import {useLogout} from '@/hooks/useLogout'
+
 
 const RightSideBar = () => {
-
-  const {logout} = useLogout();
-
-  const handleLogout = () => {
-    logout()
-  }
-
 
   return (
     <div className="fixed top-0 right-0 h-screen w-64 overflow-y-auto bg-gray-100 border-l border-gray-200">
@@ -24,7 +17,6 @@ const RightSideBar = () => {
               <p>text</p>
             </div>
           </div>
-          <Button variant={'outline'} onClick={handleLogout}>Logout</Button>
         </div>
       </div>
   )

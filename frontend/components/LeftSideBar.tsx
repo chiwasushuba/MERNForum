@@ -1,8 +1,16 @@
 import React from 'react'
 import { Button } from './ui/button'
-import CreatePost from './createPost'
+// import CreatePost from './createPost'
+import {useLogout} from '@/hooks/useLogout'
 
 const LeftSideBar = () => {
+
+  const {logout} = useLogout();
+
+  const handleLogout = () => {
+    logout()
+  }
+
   return (
     <div className="fixed top-0 left-0 h-screen w-64 overflow-y-auto bg-gray-100 border-r border-gray-200">
         <div className="flex flex-col p-4 gap-4 h-full">
@@ -27,11 +35,14 @@ const LeftSideBar = () => {
               Notifications
             </a>
           </nav>
-          <CreatePost/>
+          {/* <CreatePost/> */}
 
 
           <div className="flex mt-auto">
-            <a href="/login" className="p-2 w-full hover:bg-gray-200 rounded">
+            <a
+              onClick={handleLogout} 
+              href="/login" 
+              className="p-2 w-full hover:bg-gray-200 rounded">
               Logout
             </a>
           </div>

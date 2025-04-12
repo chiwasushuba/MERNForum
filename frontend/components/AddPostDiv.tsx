@@ -1,6 +1,6 @@
 'use client'
 
-import React, {useState} from 'react'
+import React, {ReactEventHandler, useState} from 'react'
 import {
   Card,
   CardContent,
@@ -13,24 +13,29 @@ import { Label } from '@radix-ui/react-label'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { X } from 'lucide-react'
+import {useCreatePost} from "../hooks/useCreatePost"
 
 const AddPostDiv = ({setIsOpen}: any) => {
 
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
+  const {createPost, error ,isLoading} = useCreatePost()
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Title: ", title)
-    console.log("content: ", content)
+    
+    const post = {title, content}
+
+    const response = await createPost(title, content)
 
     setTitle('')
     setContent('')
+    alert("Succesfully posted a post ")
   }
 
   return (
     <form className='relative h-screen w-screen' onSubmit={handleSubmit}>
-      <Card className='absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] w-3/5 h-3/5 p-6'>
+      <Card className='absolute top-1/2 left-248 translate-x-[-50%] translate-y-[-50%] w-3/5 h-3/5 p-6'>
         <CardHeader>
           <div className='flex flex-row justify-between'>
             <CardTitle>Add a Post</CardTitle>

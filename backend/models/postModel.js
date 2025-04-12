@@ -24,6 +24,16 @@ const postSchema = new Schema({
     required: true,
   },
 
+  photo:{
+    type: String,
+    default: "",
+  },
+
+  video:{
+    type: String,
+    default: "",
+  },
+
   likes:{
     type: Number,
     default: 0
