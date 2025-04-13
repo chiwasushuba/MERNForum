@@ -3,6 +3,8 @@ import { Card, CardContent, CardFooter, CardHeader } from './ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
 import { Button } from './ui/button';
 import { usePostsContext } from '@/hooks/usePostsContext';
+import { useAuthContext } from '@/hooks/useAuthContext';
+
 
 export interface PostInterface {
   postId: string;
@@ -26,11 +28,21 @@ const Post: React.FC<PostInterface> = ({
   onDislike 
 }) => {
 
+
+  const {user} = useAuthContext() 
   const {dispatch} = usePostsContext()
 
   const handleDelete = async () => {
+
+    if(!user){
+      return
+    }
+
     const response = await fetch(`http://localhost:4000/api/post/${postId}`, {
       method: 'DELETE',
+      headers: {
+        "Authorization": `Bearer ${user.token}`,
+      }
     });
 
     const json = await response.json();
@@ -42,6 +54,7 @@ const Post: React.FC<PostInterface> = ({
     // Dispatch a delete action if deletion succeeds
     if(response.ok){
       dispatch({ type: 'DELETE_POST', payload: json});
+      window.location.reload()
     }
     
   };

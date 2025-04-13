@@ -3,6 +3,10 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import {PostContextProvider} from "../context/PostContext"
 import {AuthContextProvider} from "../context/AuthContext"
+import { useAuthContext } from "@/hooks/useAuthContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { RouteGuard } from "./RouteGuard";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,16 +27,19 @@ export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
+}>) {  
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthContextProvider>
-          <PostContextProvider>
-            {children}
-          </PostContextProvider>
+          <RouteGuard>
+            <PostContextProvider>
+              {children}
+            </PostContextProvider>
+          </RouteGuard>
         </AuthContextProvider>
       </body>
     </html>

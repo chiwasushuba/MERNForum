@@ -10,6 +10,8 @@ export const authReducer = (state, action) => {
       return {user: action.payload}
     case 'LOGOUT':
       return {user: null}
+    case 'AUTH_READY': // checks if authorization is now okay (there is user already in localstorage)
+      return { ...state, authIsReady: true };
     default:
       return state
   }
@@ -18,7 +20,8 @@ export const authReducer = (state, action) => {
 
 export const AuthContextProvider = ({children}) => {
   const [state, dispatch] = useReducer(authReducer, {
-    user: null
+    user: null,
+    authIsReady: false,
   })
 
   useEffect(() => {
@@ -28,7 +31,7 @@ export const AuthContextProvider = ({children}) => {
       dispatch({type: "LOGIN", payload: user})
     }
 
-
+    dispatch({type: "AUTH_READY"});
 
   }, [])
 

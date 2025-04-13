@@ -38,9 +38,9 @@ export default function Home() {
     if(user){
       fetchPosts();
     }
-
-    
   }, [dispatch, user]);
+
+  
 
   console.log(posts);
 
@@ -55,7 +55,7 @@ export default function Home() {
           . */}
 
           <div className="flex flex-col items-center gap-5">
-            {posts && posts.map((post) => (
+            {posts && posts.map((post: any) => (
               <Post
                 key={post._id}
                 postId={post._id}

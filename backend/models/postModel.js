@@ -13,10 +13,9 @@ const postSchema = new Schema({
   },
 
   // author: {
-  //   type: Schema.Types.ObjectId,
+  //   type: mongoose.Schema.Types.ObjectId,
   //   ref: "User", // This tells Mongoose to reference the User model
   //   required: true,
-  //   default: "none",
   // },
 
   content:{
@@ -44,7 +43,7 @@ const postSchema = new Schema({
     default: 0
   }
 
-}, {timestamp: true})
+}, {timestamps: true})
 
 module.exports = mongoose.model("Post", postSchema)
 

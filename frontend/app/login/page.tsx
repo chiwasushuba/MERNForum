@@ -9,12 +9,15 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import {useLogin} from '@/hooks/useLogin'
 import { useLogout } from '@/hooks/useLogout';
+import { useRouter } from 'next/navigation';
 
 const Login = () => {
+  const router = useRouter();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const {login, error ,isLoading} = useLogin()
   const {logout} = useLogout();
+  
 
   const handleLogout = () =>{
     logout()
@@ -27,9 +30,16 @@ const Login = () => {
 
     const response = await login(username ,password)
 
-    setUsername('');
-    setPassword('');
-    alert("User logged in successfully!"); // Or redirect user, etc.
+
+    if(error == null){
+      setUsername('');
+      setPassword('');
+      router.push('/');
+    } else {
+      // console.log(error);
+    }
+
+    
   };
 
   
