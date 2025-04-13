@@ -2,7 +2,7 @@ const mongoose = require("mongoose")
 const Post = require("../models/postModel")
 
 const getPosts = async (req, res) => {
-  const posts = await Post.find().sort({ createdAt: -1 });
+  const posts = await Post.find().populate("user", "username profile").sort({ createdAt: -1 }); // Populate usernames for all posts
   try{
     res.status(200).json(posts)
   }catch(error){
@@ -16,7 +16,7 @@ const getPost = async (req, res) => {
 
   const { id } = req.params
   
-  const post = await Post.findById(id)
+  const post = await Post.findById(id).populate("user", "username profile");  // Populate usernames for that specific post you will need this later in getting the posts in profile
 
   if(!post){
     return res.status(404).json({error: "post not found"})
@@ -31,7 +31,8 @@ const createPost = async (req, res) => {
   const {title, content} = req.body
 
   try{
-    const post = await Post.create({title, content})
+    const user = req.user
+    const post = await Post.create({title, content, user})
     res.status(200).json(post)
   }catch(error){
     res.status(400).json({error: error.message})

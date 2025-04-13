@@ -10,6 +10,7 @@ export interface PostInterface {
   postId: string;
   title: string;
   author: string;
+  profile: string;
   content: string;
   likes?: number;
   dislikes?: number;
@@ -20,7 +21,8 @@ export interface PostInterface {
 const Post: React.FC<PostInterface> = ({
   postId,
   title, 
-  author, 
+  author,
+  profile,
   content, 
   likes = 0, 
   dislikes = 0,
@@ -61,7 +63,6 @@ const Post: React.FC<PostInterface> = ({
   
 
 
-
   return (
     <Card className='w-[600px] h-auto'>
       <CardHeader>
@@ -69,7 +70,7 @@ const Post: React.FC<PostInterface> = ({
         <h2 className="text-2xl font-bold">{title}</h2>
         <div className="flex items-center gap-2">
           <Avatar>
-            <AvatarImage className="size-8 rounded-full" src="https://github.com/shadcn.png" />
+            <AvatarImage className="size-8 rounded-full" src={profile} />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <p className="text-sm text-gray-500">By {author}</p>

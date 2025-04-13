@@ -12,11 +12,11 @@ const postSchema = new Schema({
 
   },
 
-  // author: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: "User", // This tells Mongoose to reference the User model
-  //   required: true,
-  // },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User", // This tells Mongoose to reference the User model
+    required: true,
+  },
 
   content:{
     type: String,
