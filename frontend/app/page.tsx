@@ -20,7 +20,7 @@ export default function Home() {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const response = await fetch("http://localhost:4000/api/post/", {
+      const response = await fetch(`${process.env.NEXT_API_URL}/api/post/`, {
         headers:{
           "Authorization": `Bearer ${user.token}`
         }

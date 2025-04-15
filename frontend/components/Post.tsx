@@ -40,7 +40,7 @@ const Post: React.FC<PostInterface> = ({
       return
     }
 
-    const response = await fetch(`http://localhost:4000/api/post/${postId}`, {
+    const response = await fetch(`${process.env.NEXT_API_URL}/api/post/${postId}`, {
       method: 'DELETE',
       headers: {
         "Authorization": `Bearer ${user.token}`,
