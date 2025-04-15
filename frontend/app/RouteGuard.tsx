@@ -1,22 +1,23 @@
-'use client'
+"use client";
 
 import { useAuthContext } from "@/hooks/useAuthContext";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 export function RouteGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname(); // Get current page
   const { user, authIsReady } = useAuthContext();
 
   useEffect(() => {
-    if (!user) {
-      // router.push("/signup");
-      router.push("/login"); // Redirect to login only after auth is ready
+    if (!authIsReady) return; // Ensure auth is ready before redirecting
+
+    if (!user && pathname !== "/login") {
+      router.push("/login"); // Redirect only if not logged in & not already on login
+    } else if (user && pathname === "/login") {
+      router.push("/"); // Prevent logged-in users from staying on login page
     }
-    if (user){
-      router.push("/");
-    }
-  }, [user, router]);
+  }, [user, authIsReady, pathname, router]);
 
   return <>{children}</>;
 }

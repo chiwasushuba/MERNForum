@@ -44,8 +44,12 @@ const login = async (req, res) =>{
     const user = await User.login(username, password)
 
     const token = createToken(user._id)
+    const loggedUser = await User.findById(user.id)
+    const userId = loggedUser._id
 
-    res.status(200).json({username, token})
+    
+
+    res.status(200).json({userId, username, token})
   }catch(error){
     res.status(400).json({error: error.message})
   }

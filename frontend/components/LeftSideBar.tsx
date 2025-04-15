@@ -19,10 +19,10 @@ const LeftSideBar = () => {
           </div>
 
           <nav className="flex flex-col gap-2 ml-3">
-            <a href="#" className="p-2 hover:bg-gray-200 rounded">
+            <a href="/" className="p-2 hover:bg-gray-200 rounded">
               Home
             </a>
-            <a href="#" className="p-2 hover:bg-gray-200 rounded">
+            <a href="/profile" className="p-2 hover:bg-gray-200 rounded">
               Profile
             </a>
             <a href="#" className="p-2 hover:bg-gray-200 rounded">

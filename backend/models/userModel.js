@@ -19,6 +19,11 @@ const userSchema = new Schema({
     default: "https://img.pokemondb.net/sprites/sword-shield/normal/charizard.png",
   },
 
+  bio:{
+    type: String,
+    default: "Im a bum",
+  },
+
   followers:{
     type: Number,
     default: 0,
