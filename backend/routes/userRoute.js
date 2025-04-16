@@ -6,7 +6,8 @@ const {
   deleteUser,
   updateUser,
   login,
-  signup
+  signup,
+  getUserPosts
 } = require("../controllers/userController")
 
 const router = express.Router()
@@ -28,5 +29,8 @@ router.post('/login', login);
 
 // signup
 router.post('/signup', signup)
+
+// get all users posts
+router.get(`/post/:id`, getUserPosts)
 
 module.exports = router;

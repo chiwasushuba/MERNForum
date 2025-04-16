@@ -5,7 +5,8 @@ const {
   getPost,
   createPost,
   deletePost,
-  updatePost
+  updatePost,
+
 } = require("../controllers/postController")
 const requireAuth = require("../middleware/requireAuth")
 

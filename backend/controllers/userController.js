@@ -3,6 +3,7 @@ require('dotenv').config()
 const mongoose = require("mongoose")
 const User = require("../models/userModel")
 const jwt= require("jsonwebtoken")
+const Post = require("../models/postModel")
 
 
 const createToken = (_id) => {
@@ -104,6 +105,19 @@ const updateUser = async (req, res) => {
   res.status(200).json(user)
 }
 
+// gets all the posts of the user
+const getUserPosts = async (req ,res) => {
+  const {id} = req.params
+
+  const posts = await Post.find({ "user": id }).populate("user", "username profile"); 
+
+  if(!posts){
+    res.status(404).json("No posts posted")
+  }
+
+  res.status(200).json(posts)
+}
+
 module.exports = {
   getUsers,
   getUser,
@@ -111,4 +125,6 @@ module.exports = {
   deleteUser,
   updateUser,
   login,
+  getUserPosts,
+
 }
