@@ -35,7 +35,8 @@ const AddPostDiv = ({setIsOpen}: any) => {
 
   return (
     <form className='relative h-screen w-screen' onSubmit={handleSubmit}>
-      <Card className='absolute top-1/2 left-248 translate-x-[-50%] translate-y-[-50%] w-3/5 h-3/5 p-6'>
+      {/* <Card className='absolute top-1/2 left-248 translate-x-[-50%] translate-y-[-50%] w-3/5 h-3/5 p-6'> */}
+      <Card className='absolute top-1/2 left-3/5 transform -translate-x-1/2 -translate-y-1/2 w-3/5 h-3/5 p-6'>
         <CardHeader>
           <div className='flex flex-row justify-between'>
             <CardTitle>Add a Post</CardTitle>
@@ -60,7 +61,7 @@ const AddPostDiv = ({setIsOpen}: any) => {
             onChange={(e) => setContent(e.target.value)}
           />
         </CardContent>
-        <CardFooter>
+        <CardFooter className='flex flex-row-reverse'>
           <Button variant={'outline'}>Post</Button>
         </CardFooter>    
       </Card>

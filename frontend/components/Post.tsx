@@ -4,6 +4,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
 import { Button } from './ui/button';
 import { usePostsContext } from '@/hooks/usePostsContext';
 import { useAuthContext } from '@/hooks/useAuthContext';
+import { ThumbsDown, ThumbsUp } from 'lucide-react';
 
 
 export interface PostInterface {
@@ -30,7 +31,6 @@ const Post: React.FC<PostInterface> = ({
   onDislike 
 }) => {
 
-
   const {user} = useAuthContext() 
   const {dispatch} = usePostsContext()
 
@@ -40,7 +40,7 @@ const Post: React.FC<PostInterface> = ({
       return
     }
 
-    const response = await fetch(`${process.env.NEXT_API_URL}/api/post/${postId}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/post/${postId}`, {
       method: 'DELETE',
       headers: {
         "Authorization": `Bearer ${user.token}`,
@@ -81,24 +81,23 @@ const Post: React.FC<PostInterface> = ({
       </CardContent>
       <CardFooter className="flex gap-4">
         <div className="flex items-center gap-1">
-          <button 
+          <Button
+            className=''
             onClick={onLike} 
-            aria-label="Like post"
             disabled={!onLike}
           >
-            👍
-          </button>
-          <span>{likes}</span>
+            <ThumbsUp size={48} strokeWidth={3} />
+          </Button>
+          <span className='text-2xl'>{likes}</span>
         </div>
         <div className="flex items-center gap-1">
-          <button 
+          <Button 
             onClick={onDislike} 
-            aria-label="Dislike post"
             disabled={!onDislike}
           >
-            👎
-          </button>
-          <span>{dislikes}</span>
+            <ThumbsDown size={48} strokeWidth={3} />
+          </Button>
+          <span className='text-2xl'>{dislikes}</span>
         </div>
         <Button 
           variant="destructive" 
