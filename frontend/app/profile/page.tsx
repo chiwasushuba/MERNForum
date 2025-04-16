@@ -25,7 +25,7 @@ const Page = () => {
       const userData = JSON.parse(unparsedData);
 
       try {
-        const resp = await axios.get(`http://localhost:4000/api/user/${userData.userId}`);
+        const resp = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/user/${userData.userId}`);
 
         if (resp.status === 200) {
           setUser(resp.data); // setUser() the json that was recieved in the backend
