@@ -81,29 +81,32 @@ const Post: React.FC<PostInterface> = ({
       </CardContent>
       <CardFooter className="flex gap-4">
         <div className="flex items-center gap-1">
-          <Button
-            className=''
+          <button
+            className='bg-transparent hover:bg-blue-200 rounded p-2'
             onClick={onLike} 
             disabled={!onLike}
           >
-            <ThumbsUp size={48} strokeWidth={3} />
-          </Button>
+            <ThumbsUp color="#000000" size={18} strokeWidth={3} />
+          </button>
           <span className='text-2xl'>{likes}</span>
         </div>
         <div className="flex items-center gap-1">
-          <Button 
+          <button 
+            className='bg-transparent hover:bg-red-200 rounded p-2'
             onClick={onDislike} 
             disabled={!onDislike}
           >
-            <ThumbsDown size={48} strokeWidth={3} />
-          </Button>
+            <ThumbsDown color="#000000" size={18} strokeWidth={3} />
+          </button>
           <span className='text-2xl'>{dislikes}</span>
         </div>
-        <Button 
+
+        {/* Appears only when it's authorized/owner */}
+        {user?.username === author && (<Button 
           variant="destructive" 
           onClick={handleDelete}
           className='hover:bg-red-400'
-          >Delete</Button>
+          >Delete</Button>)}
       </CardFooter>
     </Card>
   );
