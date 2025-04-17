@@ -14,12 +14,15 @@ import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { X } from 'lucide-react'
 import {useCreatePost} from "../hooks/useCreatePost"
+import { Textarea } from './ui/textarea'
 
 const AddPostDiv = ({setIsOpen}: any) => {
 
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const {createPost, error ,isLoading} = useCreatePost()
+  const [openImageBtn, setIsOpenImageBtn] = useState(false)
+  const [file, setFile] = useState('')
 
   const handleSubmit = async(e: React.FormEvent) => {
     // e.preventDefault();
@@ -34,12 +37,12 @@ const AddPostDiv = ({setIsOpen}: any) => {
   }
 
   return (
-    <form className='relative h-screen w-screen' onSubmit={handleSubmit}>
+    <div className='relative h-screen w-screen'>
       {/* <Card className='absolute top-1/2 left-248 translate-x-[-50%] translate-y-[-50%] w-3/5 h-3/5 p-6'> */}
-      <Card className='absolute top-1/2 left-3/5 transform -translate-x-1/2 -translate-y-1/2 w-3/5 h-3/5 p-6'>
+      <Card className='absolute top-1/2 left-3/5 transform -translate-x-1/2 -translate-y-1/2 w-3/5 min-h-[60%] p-6'>
         <CardHeader>
           <div className='flex flex-row justify-between'>
-            <CardTitle>Add a Post</CardTitle>
+            <CardTitle className='text-4xl'>Add a Post</CardTitle>
             <Button 
             variant={'destructive'}
             className=''
@@ -47,25 +50,41 @@ const AddPostDiv = ({setIsOpen}: any) => {
               <X size={48} strokeWidth={3} />
             </Button>
           </div>
-          <CardDescription>Enter below details about posts</CardDescription>
+          <CardDescription className='text-xl'>Enter below details about posts</CardDescription>
         </CardHeader>
-        <CardContent>
-          <Label>Title</Label>
-          <Input placeholder='Add Title Name'
+        <CardContent >
+          <Label className='text-xl mt-4'>Title</Label>
+          <Input 
+            className='mb-2 mt-2'
+            placeholder='Add Title Name'
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
-          <Label>Content</Label>
-          <Input placeholder='Add Content'
+          <Label className='text-xl'>Content</Label>
+          <Textarea
+            className='mb-2 mt-2 h-1/2'
+            placeholder='Add Content'
             value={content}
             onChange={(e) => setContent(e.target.value)}
           />
+          {/* <Label>Add Image</Label> */}
+          <Button 
+            onClick={() => setIsOpenImageBtn(prevState => !prevState)}>
+              Add Image
+          </Button>
+          {openImageBtn && <Input
+            type='file'
+            className='w-auto mt-2 mb-2'
+            placeholder='Add Image'
+            value={file}
+            onChange={(e) => setContent(e.target.value)}
+          />}
         </CardContent>
         <CardFooter className='flex flex-row-reverse'>
-          <Button variant={'outline'}>Post</Button>
+          <Button variant={'outline'} onClick={handleSubmit}>Post</Button>
         </CardFooter>    
       </Card>
-    </form>
+    </div>
   )
 }
 

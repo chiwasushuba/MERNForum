@@ -9,13 +9,15 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 // import EditProfileButton from "./edit-profile-button";
-// import DeleteAccountButton from "./delete-account-button";
 
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar"
+import DeleteAccountButton from "./DeleteAccountButton";
+import { Button } from "./ui/button";
+import { useAuthContext } from "@/hooks/useAuthContext";
 
 
 export interface ProfileInfo {
@@ -27,11 +29,8 @@ export interface ProfileInfo {
 
 export default function ProfileCard({_id, username, pfp, bio }: ProfileInfo){
 
-  const userData = localStorage.getItem('user');
-  const user = userData ? JSON.parse(userData) : null;
-  const loggedId = user?.token; // checks user token
-
-
+  const {user} = useAuthContext() 
+  
   return (
     <Card className="w-full">
       <CardHeader>
@@ -62,10 +61,11 @@ export default function ProfileCard({_id, username, pfp, bio }: ProfileInfo){
         </form>
       </CardContent>
       <CardFooter className="flex justify-end">
-        {(loggedId == _id) && (
+        {(user.username === username) && (
           <>
-            {/* <EditProfileButton />
-            <DeleteAccountButton /> */}
+            {/* <EditProfileButton /> */}
+            <DeleteAccountButton /> 
+            {/* <Button>Delete</Button> */}
           </>
         )}
         

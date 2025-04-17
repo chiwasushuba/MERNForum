@@ -19,7 +19,7 @@ export interface PostInterface {
   onDislike?: () => void;
 }
 
-const Post: React.FC<PostInterface> = ({
+const PostPreview: React.FC<PostInterface> = ({
   postId,
   title, 
   author,
@@ -112,4 +112,4 @@ const Post: React.FC<PostInterface> = ({
   );
 };
 
-export default Post;
+export default PostPreview;
