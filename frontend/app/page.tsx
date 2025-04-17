@@ -1,13 +1,13 @@
 'use client'
 
 import LeftSideBar from "@/components/LeftSideBar";
-import Post from "@/components/Post";
 import RightSideBar from "@/components/RightSideBar";
 import { Separator } from "@/components/ui/separator";
 import { usePostsContext } from "@/hooks/usePostsContext";
 import { useEffect } from "react";
 import { useAuthContext } from "@/hooks/useAuthContext";  
 import AddPostButton from "@/components/AddPostButton";
+import PostPreview from "@/components/PostPreview";
 
 
 
@@ -56,7 +56,7 @@ export default function Home() {
 
           <div className="flex flex-col items-center gap-5">
             {posts && posts.map((post: any) => (
-              <Post
+              <PostPreview
                 key={post._id}
                 postId={post._id}
                 title={post.title}

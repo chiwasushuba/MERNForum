@@ -5,7 +5,7 @@ import LeftSideBar from "@/components/LeftSideBar";
 import RightSideBar from "@/components/RightSideBar";
 import ProfileCard from "@/components/ProfileCard";
 import axios from "axios";
-import Post from "@/components/Post";
+import PostPreview from "@/components/PostPreview";
 
 const Page = () => {
   const [user, setUser] = useState<any>(null);
@@ -56,7 +56,7 @@ const Page = () => {
         const resp = await axios.get(`http://localhost:4000/api/user/post/${userData.userId}`);
 
         if (resp.status === 200) {
-          setPosts(resp.data); // setPosts() the json that was recieved in the backend
+          setPosts(resp.data); // setPosts() the json that was recieved in the backend (i get the data so i don't need to store it in an array structure)
         }
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -64,7 +64,6 @@ const Page = () => {
         setLoading(false);
       }
     };
-    alert("fetchedPosts")
     fetchPosts();
   }, [])
 
@@ -78,7 +77,7 @@ const Page = () => {
           <ProfileCard _id={user._id} username={user.username} bio={user.bio} pfp={user.profile} />
           <div className="flex flex-col items-center gap-3 mt-10">
             {posts && posts.map((post: any) => (
-              <Post
+              <PostPreview
                 key={post._id}
                 postId={post._id}
                 title={post.title}
