@@ -6,14 +6,25 @@ const express = require("express");
 
 const userRoutes = require('./routes/userRoute');
 const postRoutes = require('./routes/postRoute')
+const uploadRoutes = require('./routes/uploadRoute');
+// Automatic Folder Creator
+const fs = require('fs');
+const path = require('path');
 
+
+// for multer (Automatic Folder Maker)
+const uploadDir = path.join(__dirname, 'uploads');
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
+
+// creates APP in express to access the whole backend application
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-
-
 
 // Middleware
 app.use((req, res, next) => {
@@ -21,9 +32,14 @@ app.use((req, res, next) => {
   next();
 })
 
+
+
+
 //Routes
 app.use("/api/user",userRoutes);
 app.use("/api/post", postRoutes);
+app.use('/api', uploadRoutes);
+
 
 // Connect DB and Server Start
 mongoose.connect(process.env.MONGO_URI)
