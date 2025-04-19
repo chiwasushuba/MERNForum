@@ -13,9 +13,9 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
     if (!authIsReady) return; // Ensure auth is ready before redirecting
 
     if (!user && pathname !== "/login") {
-      router.push("/login"); // Redirect only if not logged in & not already on login
+      router.replace("/login"); // Redirect only if not logged in & not already on login
     } else if (user && pathname === "/login") {
-      router.push("/"); // Prevent logged-in users from staying on login page
+      router.replace("/"); // Prevent logged-in users from staying on login page
     }
   }, [user, authIsReady, pathname, router]);
 

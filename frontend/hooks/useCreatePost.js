@@ -31,7 +31,7 @@ export const useCreatePost = () => {
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/post`, {
         method: "POST",
-        headers: {"Content-Type": 'application/json', "Authorization": `Bearer ${user.token}`},
+        headers: {"Authorization": `Bearer ${user.token}`},
         body: formData
   
       })
