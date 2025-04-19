@@ -32,6 +32,9 @@ const createPost = async (req, res) => {
 
   try{
     const user = req.user
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized: No user found' });
+    }
 
     let imageUrl = ''
 
@@ -39,8 +42,13 @@ const createPost = async (req, res) => {
       imageUrl = `/uploads/${req.file.filename}`
     }
 
+    // If there was a file upload error (added by Multer)
+    if (req.fileValidationError) {
+      return res.status(400).json({ error: req.fileValidationError });
+    }
+
     const post = await Post.create({title, content, imageUrl ,user})
-    
+
     res.status(200).json(post)
   }catch(error){
     res.status(400).json({error: error.message})

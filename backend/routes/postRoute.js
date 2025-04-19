@@ -9,7 +9,8 @@ const {
 
 } = require("../controllers/postController")
 const requireAuth = require("../middleware/requireAuth")
-const upload = require('../middleware/requireMulter');
+const upload = require('../middleware/requireUpload');
+const {uploadImage} = require("../controllers/uploadController")
 
 const router = express.Router()
 
@@ -23,7 +24,10 @@ router.get('/', getPosts)
 router.get('/:id', getPost)
 
 // create a post
-router.post('/', upload.single('image'),createPost)
+router.post('/', upload.single("image"), createPost);
+
+// uploads a single image no text
+router.post('/upload', upload.single('image'), uploadImage);
 
 // delete a post
 router.delete('/:id', deletePost)

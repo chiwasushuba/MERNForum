@@ -23,7 +23,12 @@ const app = express();
 
 // Middleware
 app.use(cors());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+
+// IMPORTANT: Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Middleware
 app.use((req, res, next) => {
@@ -35,6 +40,7 @@ app.use((req, res, next) => {
 //Routes
 app.use("/api/user",userRoutes);
 app.use("/api/post", postRoutes);
+
 
 
 // Connect DB and Server Start

@@ -23,7 +23,7 @@ const AddPostButton = () => {
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }} 
           animate={{ opacity: 1, scale: 1 }} 
-          exit={{ opacity: 0, scale: 0.9 }}
+          exit={{ opacity: 0, scale: 1.9 }}
         >
           <AddPostDiv setIsOpen={setIsOpen}/>
         </motion.div>
