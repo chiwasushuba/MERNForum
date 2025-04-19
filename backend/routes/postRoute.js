@@ -9,6 +9,7 @@ const {
 
 } = require("../controllers/postController")
 const requireAuth = require("../middleware/requireAuth")
+const upload = require('../middleware/requireMulter');
 
 const router = express.Router()
 
@@ -22,7 +23,7 @@ router.get('/', getPosts)
 router.get('/:id', getPost)
 
 // create a post
-router.post('/', createPost)
+router.post('/', upload.single('image'),createPost)
 
 // delete a post
 router.delete('/:id', deletePost)

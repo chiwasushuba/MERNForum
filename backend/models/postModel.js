@@ -23,7 +23,7 @@ const postSchema = new Schema({
     required: true,
   },
 
-  photo:{
+  image:{
     type: String,
     default: "",
   },

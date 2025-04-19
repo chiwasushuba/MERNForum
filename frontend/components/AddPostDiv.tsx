@@ -15,21 +15,25 @@ import { Button } from './ui/button'
 import { X } from 'lucide-react'
 import {useCreatePost} from "../hooks/useCreatePost"
 import { Textarea } from './ui/textarea'
+import axios from 'axios'
 
 const AddPostDiv = ({setIsOpen}: any) => {
 
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
+  const [imageUrl, setImageUrl] = useState('')
   const {createPost, error ,isLoading} = useCreatePost()
   const [openImageBtn, setIsOpenImageBtn] = useState(false)
-  const [file, setFile] = useState('')
+  
 
   const handleSubmit = async(e: React.FormEvent) => {
     // e.preventDefault();
-    
-    const post = {title, content}
+    if (!title || !content) return alert("Title and content are required!");
 
-    const response = await createPost(title, content)
+
+    const post = {title, content, imageUrl}
+
+    const response = await createPost(post)
 
     setTitle('')
     setContent('')
@@ -75,9 +79,7 @@ const AddPostDiv = ({setIsOpen}: any) => {
           {openImageBtn && <Input
             type='file'
             className='w-auto mt-2 mb-2'
-            placeholder='Add Image'
-            value={file}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(e) => setImageUrl(e.target.value)}
           />}
         </CardContent>
         <CardFooter className='flex flex-row-reverse'>

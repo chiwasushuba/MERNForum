@@ -6,7 +6,7 @@ const express = require("express");
 
 const userRoutes = require('./routes/userRoute');
 const postRoutes = require('./routes/postRoute')
-const uploadRoutes = require('./routes/uploadRoute');
+
 // Automatic Folder Creator
 const fs = require('fs');
 const path = require('path');
@@ -14,7 +14,6 @@ const path = require('path');
 
 // for multer (Automatic Folder Maker)
 const uploadDir = path.join(__dirname, 'uploads');
-
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
@@ -33,12 +32,9 @@ app.use((req, res, next) => {
 })
 
 
-
-
 //Routes
 app.use("/api/user",userRoutes);
 app.use("/api/post", postRoutes);
-app.use('/api', uploadRoutes);
 
 
 // Connect DB and Server Start

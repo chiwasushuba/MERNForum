@@ -28,11 +28,19 @@ const getPost = async (req, res) => {
 
 // create a post
 const createPost = async (req, res) => {
-  const {title, content} = req.body
+  const {title, content } = req.body
 
   try{
     const user = req.user
-    const post = await Post.create({title, content, user})
+
+    let imageUrl = ''
+
+    if(req.file){
+      imageUrl = `/uploads/${req.file.filename}`
+    }
+
+    const post = await Post.create({title, content, imageUrl ,user})
+    
     res.status(200).json(post)
   }catch(error){
     res.status(400).json({error: error.message})
