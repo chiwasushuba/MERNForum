@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Card,
   CardContent,
@@ -19,10 +19,21 @@ import { Textarea } from './ui/textarea'
 const AddPostDiv = ({ setIsOpen } : any) => {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
-  const [image, setImage] = useState(null) // Changed to null for consistency
+  const [image, setImage] = useState<File | null>(null); // Changed to null for consistency
   const [imagePreview, setImagePreview] = useState('') // Added for image preview
   const { createPost, error, isLoading } = useCreatePost()
   const [openImageBtn, setIsOpenImageBtn] = useState(false)
+
+  // Handles memory leak
+  useEffect(() => {
+    // Cleanup previous preview URL to prevent memory leaks
+    return () => {
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]); 
+
   
   // Fixed handleImageChange function
   const handleImageChange = (e: any) => {
@@ -40,7 +51,7 @@ const AddPostDiv = ({ setIsOpen } : any) => {
   const handleSubmit = async (e: any) => {
     e.preventDefault(); // Added to prevent default form submission
     
-    if (!title || !content) {
+    if (!title.trim() || !content.trim()) {
       return alert("Title and content are required!")
     }
 
@@ -69,8 +80,9 @@ const AddPostDiv = ({ setIsOpen } : any) => {
   }
 
   return (
-    <div className='relative h-screen w-screen'>
-      <Card className='absolute top-1/2 left-3/5 transform -translate-x-1/2 -translate-y-1/2 w-3/5 min-h-[60%] p-6'>
+    <div className='fixed inset-0 flex justify-center items-center z-50'>
+      {/* className='absolute top-1/2 left-3/5 transform -translate-x-1/2 -translate-y-1/2 w-3/5 min-h-[60%] p-6' */}
+      <Card className='w-3/5 min-h-[60%] max-h-[80%] p-6 overflow-y-auto'>
         <CardHeader>
           <div className='flex flex-row justify-between'>
             <CardTitle className='text-4xl'>Add a Post</CardTitle>
@@ -83,7 +95,7 @@ const AddPostDiv = ({ setIsOpen } : any) => {
           <CardDescription className='text-xl'>Enter below details about posts</CardDescription>
         </CardHeader>
         
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} encType='multipart/form-data'>
           <CardContent>
             <div className="space-y-4">
               <div className="space-y-2">

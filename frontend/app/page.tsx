@@ -72,7 +72,6 @@ export default function Home() {
         </div>
       </div>
       <RightSideBar />
-
     </div>
   );
 }
