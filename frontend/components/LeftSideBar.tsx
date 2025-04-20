@@ -7,6 +7,14 @@ const LeftSideBar = () => {
 
   const {logout} = useLogout();
 
+  let userId=""
+  const sessionItem = sessionStorage.getItem('user')
+  if(sessionItem){
+    const parsedItem = JSON.parse(sessionItem)
+    userId = parsedItem._id
+  } 
+  
+
   const handleLogout = () => {
     logout()
   }
@@ -22,7 +30,8 @@ const LeftSideBar = () => {
             <a href="/" className="p-2 hover:bg-gray-200 rounded">
               Home
             </a>
-            <a href="/profile" className="p-2 hover:bg-gray-200 rounded">
+
+            <a href={`/profile?id=${userId}`} className="p-2 hover:bg-gray-200 rounded">
               Profile
             </a>
             <a href="#" className="p-2 hover:bg-gray-200 rounded">

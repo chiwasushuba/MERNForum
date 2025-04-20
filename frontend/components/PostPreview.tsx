@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from './ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
@@ -5,12 +7,18 @@ import { Button } from './ui/button';
 import { usePostsContext } from '@/hooks/usePostsContext';
 import { useAuthContext } from '@/hooks/useAuthContext';
 import { ThumbsDown, ThumbsUp } from 'lucide-react';
+import Link from 'next/link';
 
+interface Author {
+  _id: string;
+  username: string;
+  profile: string;
+}
 
 export interface PostInterface {
   postId: string;
   title: string;
-  author: string;
+  author: Author;
   profile: string;
   content: string;
   likes?: number;
@@ -18,6 +26,8 @@ export interface PostInterface {
   onLike?: () => void;
   onDislike?: () => void;
 }
+
+
 
 const PostPreview: React.FC<PostInterface> = ({
   postId,
@@ -69,11 +79,15 @@ const PostPreview: React.FC<PostInterface> = ({
       
         <h2 className="text-2xl font-bold">{title}</h2>
         <div className="flex items-center gap-2">
-          <Avatar>
-            <AvatarImage className="size-8 rounded-full" src={profile} />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-          <p className="text-sm text-gray-500">By {author}</p>
+          <Link href={`/profile?id=${author._id}`}>
+            <Avatar>
+              <AvatarImage className="size-8 rounded-full" src={profile} />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+          </Link>
+          <Link href={`/profile?id=${author._id}`} className="hover:underline text-sm font-medium text-gray-500">
+            {author.username}
+          </Link>
         </div>
       </CardHeader>
       <CardContent>
@@ -102,7 +116,7 @@ const PostPreview: React.FC<PostInterface> = ({
         </div>
 
         {/* Appears only when it's authorized/owner */}
-        {user?.username === author && (<Button 
+        {user?.username === author.username && (<Button 
           variant="destructive" 
           onClick={handleDelete}
           className='hover:bg-red-400'

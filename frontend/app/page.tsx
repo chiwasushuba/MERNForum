@@ -60,7 +60,7 @@ export default function Home() {
                 key={post._id}
                 postId={post._id}
                 title={post.title}
-                author={post.user.username}
+                author={post.user}
                 profile={post.user.profile}
                 content={post.content}
               />
