@@ -16,6 +16,8 @@ const Page = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [posts, setPosts] = useState<any>(null)
 
+  console.log(userId)
+
   useEffect(() => {
     if (!userId) {
       console.error("No user ID found in URL");
@@ -23,12 +25,17 @@ const Page = () => {
       return;
     }
 
-    const fetchUser = async () => {
+    const fetchEverything = async () => {
 
       try {
-        const resp = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/user/${userId}`)
-        if (resp.status === 200) {
-          setUser(resp.data); // setUser() the json that was recieved in the backend
+        const [userResp, postResp]= await Promise.all([
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/user/${userId}`), // this is for user
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/user/post/${userId}`) // this is for the posts
+        
+        ])
+        if (userResp.status === 200 && postResp.status === 200) {
+          setUser(userResp.data); // setUser() the json that was recieved in the backend
+          setPosts(postResp.data);
         }
       } catch (error) {
         console.error("Error fetching user:", error)
@@ -37,27 +44,9 @@ const Page = () => {
       }
     };
 
-    fetchUser();
+    fetchEverything()
+
   }, [userId]);
-
-  useEffect(() => {
-    const fetchPosts = async () => {
-      if(!user) return;
-
-      try {
-        const resp = await axios.get(`http://localhost:4000/api/user/post/${userId}`);
-
-        if (resp.status === 200) {
-          setPosts(resp.data); // setPosts() the json that was recieved in the backend (i get the data so i don't need to store it in an array structure)
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPosts();
-  }, [userId])
 
   if (loading) return <p>Loading...</p>;
 
@@ -68,12 +57,14 @@ const Page = () => {
         <div className="w-200">
           <ProfileCard _id={user._id} username={user.username} bio={user.bio} pfp={user.profile} />
           <div className="flex flex-col items-center gap-3 mt-10">
+
+            <div>Test</div>
             {posts && posts.map((post: any) => (
               <PostPreview
                 key={post._id}
                 postId={post._id}
                 title={post.title}
-                author={post.user.username}
+                author={post.user}
                 profile={post.user.profile}
                 content={post.content}
               />

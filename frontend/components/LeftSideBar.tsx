@@ -1,18 +1,23 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from './ui/button'
 // import CreatePost from './createPost'
 import {useLogout} from '@/hooks/useLogout'
+import Link from 'next/link';
 
 const LeftSideBar = () => {
 
   const {logout} = useLogout();
+  const [userId, setUserId] = useState("")
 
-  let userId=""
-  const sessionItem = sessionStorage.getItem('user')
-  if(sessionItem){
-    const parsedItem = JSON.parse(sessionItem)
-    userId = parsedItem._id
-  } 
+
+  useEffect(() => {
+    const localItem = localStorage.getItem('user')
+    if(localItem){
+      const parsedItem = JSON.parse(localItem)
+      setUserId(parsedItem.userId)
+    } 
+  }, [])
+  
   
 
   const handleLogout = () => {
@@ -31,9 +36,9 @@ const LeftSideBar = () => {
               Home
             </a>
 
-            <a href={`/profile?id=${userId}`} className="p-2 hover:bg-gray-200 rounded">
+            <Link href={`/profile?id=${userId}`} className="p-2 hover:bg-gray-200 rounded">
               Profile
-            </a>
+            </Link>
             <a href="#" className="p-2 hover:bg-gray-200 rounded">
               Settings
             </a>

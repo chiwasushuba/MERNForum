@@ -28,7 +28,6 @@ export default function Home() {
       const json = await response.json()
 
       if (response.ok) {
-        console.log("Fetched posts:", json);
         dispatch({ type: 'SET_POSTS', payload: json });
       } else {
         console.error('Failed to fetch posts');
@@ -41,9 +40,6 @@ export default function Home() {
   }, [dispatch, user]);
 
   
-
-  console.log(posts);
-
   return(
     <div className="flex justify-around">
       <LeftSideBar />
