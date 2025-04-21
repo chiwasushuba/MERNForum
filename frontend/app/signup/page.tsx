@@ -12,18 +12,22 @@ import {useSignup} from '@/hooks/useSignup'
 const Signup = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
   const {signup, error ,isLoading} = useSignup()
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    // e.preventDefault();
 
-    const user = { username, password };
+    const user = {email, username, password };
 
-    const response = await signup(username ,password)
+    const response = await signup(email, username ,password)
 
-    setUsername('');
-    setPassword('');
-    alert("User created successfully!"); // Or redirect user, etc.
+    if(error == null){
+      setEmail('');
+      setUsername('');
+      setPassword('');
+      alert("User created successfully!"); // Or redirect user, etc.
+    }
   };
 
   return (
@@ -41,6 +45,15 @@ const Signup = () => {
           </div>
 
           <form className="space-y-4" onSubmit={handleSubmit}>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input 
+                id="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
@@ -62,15 +75,14 @@ const Signup = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   />
-                <button
+                {/* <button
                   type="button"
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
                   <EyeOff size={20} />
-                </button>
+                </button> */}
               </div>
             </div>
-
             <Button type="submit" className="w-full hover:bg-gray-600 cursor-pointer">Sign-up</Button>
           </form>
 

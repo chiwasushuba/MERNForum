@@ -49,7 +49,7 @@ const AddPostDiv = ({ setIsOpen } : any) => {
   }
 
   const handleSubmit = async (e: any) => {
-    e.preventDefault(); // Added to prevent default form submission
+    // e.preventDefault(); // Added to prevent default form submission
     
     if (!title.trim() || !content.trim()) {
       return alert("Title and content are required!")

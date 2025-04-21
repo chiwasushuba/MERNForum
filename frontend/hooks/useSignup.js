@@ -6,14 +6,14 @@ export const useSignup = () => {
   const [isLoading, setIsLoading] = useState(null)
   const {dispatch} = useAuthContext()
 
-  const signup = async (username, password) => {
+  const signup = async (email, username, password) => {
     setIsLoading(true)
     setError(null)
 
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/signup`, {
       method: "POST",
       headers: {"Content-Type": 'application/json'},
-      body: JSON.stringify({username, password})
+      body: JSON.stringify({email, username, password})
 
     })
     const json = await response.json()
