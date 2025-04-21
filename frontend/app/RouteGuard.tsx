@@ -12,10 +12,10 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!authIsReady) return;
 
-    if (!user && pathname !== "/login") {
+    if (!user && pathname !== "/login" && pathname !== "/signup") {
       // Redirect only if not logged in & not already on login
       router.replace("/login"); 
-    } else if (user && pathname === "/login") {
+    } else if (user && (pathname === "/login" || pathname === "/signup")) {
       // Prevent logged-in users from staying on login page
       router.replace("/"); 
     }

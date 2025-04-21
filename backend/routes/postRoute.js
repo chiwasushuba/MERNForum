@@ -9,7 +9,7 @@ const {
 
 } = require("../controllers/postController")
 const requireAuth = require("../middleware/requireAuth")
-const upload = require('../middleware/requireUpload');
+const upload = require('../utils/requireUpload');
 const {uploadImage} = require("../controllers/uploadController")
 
 const router = express.Router()
