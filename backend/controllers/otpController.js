@@ -6,12 +6,19 @@ const UserOTP = require("../models/userOTPModel"); // Create a Mongoose model fo
 
 const sendOtp = async (req, res) => {
   const { email } = req.body;
+
+
+  // this generates the otp
   const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false });
 
   try {
 
     let userOtp = await UserOTP.findOne({ email });
-  // Save OTP in the database with expiry time (optional)
+    
+    // console.log(userOtp) //debug user di ko makita kanina
+
+
+    // Save OTP in the database with expiry time (optional)
     if (!userOtp) {
         userOtp = await UserOTP.create({ email, otp, otpExpires: Date.now() + 300000 });
     } else {
@@ -52,19 +59,33 @@ const sendOtp = async (req, res) => {
   }
 };
 
+
+// verify the otp that changes the user's verified to true
 const verifyOtp = async (req, res) => {
+    
+    // EMAILS are unique
     const { email, otp } = req.body;
     const user = await UserOTP.findOne({ email });
-    console.log("user: ", user)
-
+    
     if (!user || user.otp !== otp || Date.now() > user.otpExpires) {
         return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
     }
 
     // OTP is correct, proceed with authentication
-    res.json({ success: true, message: "OTP verified!"});
+
+    
+    const emailUser = await User.findOneAndUpdate(
+        {email}, 
+        { $set: { verified: true } }, // Update the verified field
+        { new: true }
+    );
+
+    res.json({ success: true, message: "OTP verified!", user: emailUser}); // checks the user if it is now verified
 };
 
+
+
+// get the existing otps
 const getCurrentOtp = async (req, res) => {
     const otps = await UserOTP.find()
 

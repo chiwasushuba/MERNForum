@@ -17,7 +17,7 @@ const userOTPSchema = new mongoose.Schema({
     required: true 
   },
 
-  createdAt: { type: Date, default: Date.now, expires: 300 }, // Auto-delete after 5 minutes
+  createdAt: { type: Date, default: Date.now, expires: 900 }, // Auto-delete after 15 minutes
 });
 
 module.exports = mongoose.model('UserOTP', userOTPSchema);

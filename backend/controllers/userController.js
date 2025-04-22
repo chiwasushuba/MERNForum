@@ -40,18 +40,16 @@ const getUser = async (req, res) => {
 // login
 
 const login = async (req, res) =>{
-  const {username, password} = req.body
+  const {email, password} = req.body
 
   try{
-    const user = await User.login(username, password)
+    const user = await User.login(email, password)
 
     const token = createToken(user._id)
     const loggedUser = await User.findById(user.id)
     const userId = loggedUser._id
 
-    
-
-    res.status(200).json({userId, username, token})
+    res.status(200).json({userId, email, token})
   }catch(error){
     res.status(400).json({error: error.message})
   }
@@ -60,7 +58,6 @@ const login = async (req, res) =>{
 // signup
 const signup = async (req, res) => {
   const {email, username, password} = req.body
-
   
 
   try{

@@ -8,11 +8,13 @@ const userSchema = new Schema({
   email:{
     type: String,
     required: true,
+    unique: true
   },
 
   username:{
     type: String,
     required: true,
+    unique: true
   },
 
   password:{
@@ -59,10 +61,10 @@ userSchema.statics.signup = async function(email, username, password){
     throw Error("Both fields must be filled")
   } 
 
-  const exists = await this.findOne({username})
+  const exists = await this.findOne({email})
 
   if(exists){
-    throw Error(username + " already exists")
+    throw Error(email + " already exists. Use another email!!!")
   }
 
   const salt = await bcrypt.genSalt(10)
@@ -73,16 +75,16 @@ userSchema.statics.signup = async function(email, username, password){
   return user
 }
 
-userSchema.statics.login = async function(username, password){
+userSchema.statics.login = async function(email, password){
 
-  if(!username || !password){
+  if(!email || !password){
     throw Error("Both fields must be filled")
   }
 
-  const user = await this.findOne({username})
+  const user = await this.findOne({email})
 
   if(!user){
-    throw Error("Username is incorrect")
+    throw Error("Email is incorrect")
   }
 
   const match = await bcrypt.compare(password, user.password)
