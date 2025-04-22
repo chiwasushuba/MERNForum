@@ -12,18 +12,16 @@ import {useSignup} from '@/hooks/useSignup'
 const Signup = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [email, setEmail] = useState('');
   const {signup, error ,isLoading} = useSignup()
 
   const handleSubmit = async (e: React.FormEvent) => {
     // e.preventDefault();
 
-    const user = {email, username, password };
+    const user = {username, password };
 
-    const response = await signup(email, username ,password)
+    const response = await signup(username ,password)
 
     if(error == null){
-      setEmail('');
       setUsername('');
       setPassword('');
       alert("User created successfully!"); // Or redirect user, etc.
@@ -45,7 +43,9 @@ const Signup = () => {
           </div>
 
           <form className="space-y-4" onSubmit={handleSubmit}>
-            <div className="space-y-2">
+
+            {/* Redacted idea signing up with an email */}
+            {/* <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input 
                 id="email" 
@@ -53,7 +53,7 @@ const Signup = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
-            </div>
+            </div> */}
 
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>

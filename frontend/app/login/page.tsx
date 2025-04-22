@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 
 const Login = () => {
   const router = useRouter();
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const {login, error ,isLoading} = useLogin()
   const {logout} = useLogout();
@@ -26,13 +26,13 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const user = { email, password };
+    const user = { username, password };
 
-    const response = await login(email ,password)
+    const response = await login(username ,password)
 
 
     if(error == null){
-      setEmail('');
+      setUsername('');
       setPassword('');
       router.push('/');
     } else {
@@ -61,11 +61,11 @@ const Login = () => {
           <form className="space-y-4" onSubmit={handleSubmit}>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="username">Username</Label>
               <Input 
-                id="email" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="username" 
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
               />
             </div>
