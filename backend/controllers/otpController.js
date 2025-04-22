@@ -5,14 +5,18 @@ const nodemailer = require("nodemailer");
 const UserOTP = require("../models/userOTPModel"); // Create a Mongoose model for OTPs
 
 const sendOtp = async (req, res) => {
-  const { email } = req.body;
+    const { email } = req.body;
+    const exists = await User.findOne({ email });
 
+    if(exists){
+        res.json({ message: "Email already used by other user choose another!" });
+    }
 
   // this generates the otp
   const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false });
 
   try {
-
+    
     let userOtp = await UserOTP.findOne({ email });
     
     // console.log(userOtp) //debug user di ko makita kanina
@@ -20,7 +24,7 @@ const sendOtp = async (req, res) => {
 
     // Save OTP in the database with expiry time (optional)
     if (!userOtp) {
-        userOtp = await UserOTP.create({ email, otp, otpExpires: Date.now() + 300000 });
+        userOtp = await UserOTP.create({email, otp, otpExpires: Date.now() + 300000 });
     } else {
         userOtp = await UserOTP.findOneAndUpdate(
             { email },
@@ -64,9 +68,9 @@ const sendOtp = async (req, res) => {
 const verifyOtp = async (req, res) => {
     
     // EMAILS are unique
-    const { email, otp } = req.body;
+    const {username, email, otp } = req.body;
     const user = await UserOTP.findOne({ email });
-    
+
     if (!user || user.otp !== otp || Date.now() > user.otpExpires) {
         return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
     }
@@ -75,10 +79,12 @@ const verifyOtp = async (req, res) => {
 
     
     const emailUser = await User.findOneAndUpdate(
-        {email}, 
-        { $set: { verified: true } }, // Update the verified field
+        {username}, 
+        { $set: { email: email, verified: true } }, // Update the verified field and add the email now to the user
         { new: true }
     );
+
+    
 
     res.json({ success: true, message: "OTP verified!", user: emailUser}); // checks the user if it is now verified
 };

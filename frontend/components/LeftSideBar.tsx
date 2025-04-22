@@ -5,7 +5,7 @@ import {useLogout} from '@/hooks/useLogout'
 import Link from 'next/link';
 
 const LeftSideBar = () => {
-
+  
   const {logout} = useLogout();
   const [userId, setUserId] = useState("")
 
@@ -39,7 +39,7 @@ const LeftSideBar = () => {
             <Link href={`/profile?id=${userId}`} className="p-2 hover:bg-gray-200 rounded">
               Profile
             </Link>
-            <a href="#" className="p-2 hover:bg-gray-200 rounded">
+            <a href="/settings" className="p-2 hover:bg-gray-200 rounded">
               Settings
             </a>
             <a href="#" className="p-2 hover:bg-gray-200 rounded">
