@@ -5,7 +5,8 @@ const express = require("express");
 
 
 const userRoutes = require('./routes/userRoute');
-const postRoutes = require('./routes/postRoute')
+const postRoutes = require('./routes/postRoute');
+const otpRoutes = require("./routes/otpRoute")
 
 // Automatic Folder Creator
 const fs = require('fs');
@@ -40,6 +41,7 @@ app.use((req, res, next) => {
 //Routes
 app.use("/api/user",userRoutes);
 app.use("/api/post", postRoutes);
+app.use("/api/otp", otpRoutes)
 
 
 

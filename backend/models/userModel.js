@@ -38,6 +38,11 @@ const userSchema = new Schema({
   following:{
     type: Number,
     default: 0
+  },
+  
+  verified:{
+    type: Boolean,
+    default: false
   }
 
 }, {timestamp: true})
