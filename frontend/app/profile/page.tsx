@@ -58,7 +58,6 @@ const Page = () => {
           <ProfileCard _id={user._id} username={user.username} bio={user.bio} pfp={user.profile} />
           <div className="flex flex-col items-center gap-3 mt-10">
 
-            <div>Test</div>
             {posts && posts.map((post: any) => (
               <PostPreview
                 key={post._id}

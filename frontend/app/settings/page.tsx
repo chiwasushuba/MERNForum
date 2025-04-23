@@ -16,56 +16,79 @@ import VerifyOTPDiv from '@/components/VerifyOTPDiv'
 const page = () => {
   const searchParams = useSearchParams();
   const userId = searchParams.get("id");
-  const [user, setUser] = useState<any>(null);
+  const [username, setUsername] = useState<any>(null);
   const [email, setEmail] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const [error, setError] = useState("")
 
   useEffect(() => {
     const localUser = localStorage.getItem('user')
     if(localUser){
       const parsedUser = JSON.parse(localUser)
-      setUser(parsedUser.username)
-      console.log(user)
+      setUsername(parsedUser.username)
     }
   }, [])
 
+  
+
+
+  // Handle submit
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
+    console.log(username)
     const sendOTP = async () => {
 
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_URL_API}/api/otp/send`)
+      try{
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/otp/send`, {
+          email: email
+        })
 
-      if( response.status === 200){
-        setIsOpen(true)
+        if( response.status === 200){
+          setError("")
+          setIsOpen(true)
+          alert(`Alert sent to: ${email}`)
+        } 
+      } catch (err: any) {
+        if (err.response) {
+          setError(err.response.data.message || "Failed to send OTP.")
+        } else {
+          setError("Network error or server not reachable.")
+        }
+  
+        console.error("OTP sending error:", err)
       }
-      
     }
 
-    console.log(email)
+    sendOTP()
   }
+
+  
 
   return (
     <div className='flex flex-row justify-around'>
       <LeftSideBar/>
         <Card className='w-200 p-4'>
           <Card className='pl-4 pr-4'>
-            <Label className='text-xl font-semibold '>Verify OTP</Label>
-            <form className="flex flex-row gap-4" onSubmit={handleSubmit}>
-              <Input 
-                className='w-70'
-                value={email}
-                onChange={(e) => {setEmail(e.target.value)}}
-              />
-              <Button 
-                className='bg-gray-700 text-white'
-                variant={'outline'}
-                type='submit'
-              >
-                Verify
-              </Button>
-            </form>
-            {isOpen && <VerifyOTPDiv username={user} email={email}/>}
+            <div>
+              <Label className='text-xl font-semibold '>Verify OTP</Label>
+              <form className="flex flex-row gap-4" onSubmit={handleSubmit}>
+                <Input 
+                  className='w-70'
+                  value={email}
+                  onChange={(e) => {setEmail(e.target.value)}}
+                />
+                <Button 
+                  className='bg-gray-700 text-white'
+                  variant={'outline'}
+                  type='submit'
+                >
+                  Verify
+                </Button>
+              </form>
+              {error && <Label className='text-red-600'>{error}</Label>}
+            </div>
+            {isOpen && <VerifyOTPDiv username={username} email={email}/>}
 
           </Card>
         </Card>

@@ -5,15 +5,15 @@ const nodemailer = require("nodemailer");
 const UserOTP = require("../models/userOTPModel"); // Create a Mongoose model for OTPs
 
 const sendOtp = async (req, res) => {
-    const { email } = req.body;
+    const {email } = req.body;
     const exists = await User.findOne({ email });
 
     if(exists){
-        res.json({ message: "Email already used by other user choose another!" });
+        return res.status(400).json({ message: "Email already used by other user choose another!" });
     }
 
   // this generates the otp
-  const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false });
+  const otp = otpGenerator.generate(6, { upperCaseAlphabets: true, specialChars: false }).toUpperCase();
 
   try {
     
@@ -46,7 +46,7 @@ const sendOtp = async (req, res) => {
       from: process.env.EMAIL_USER,
       to: email,
       subject: "Your OTP Code",
-      text: `Use this OTP to verify your account: ${otp}. It expires in 5 minutes.`
+      text: `Use this OTP to verify your account: ${otp}. It expires in 15 minutes.`
   };
 
   
@@ -59,7 +59,8 @@ const sendOtp = async (req, res) => {
       });
       res.json({ success: true, message: "OTP sent to email", otp: otp });
   } catch (error) {
-      res.status(500).json({ success: false, message: "Error sending OTP" });
+        console.error("sendOtp error:", error);
+        res.status(500).json({ success: false, message: "Error sending OTP" });
   }
 };
 
@@ -69,9 +70,16 @@ const verifyOtp = async (req, res) => {
     
     // EMAILS are unique
     const {username, email, otp } = req.body;
-    const user = await UserOTP.findOne({ email });
 
-    if (!user || user.otp !== otp || Date.now() > user.otpExpires) {
+    const user = await User.findOne({username});
+
+    const sentOtp = await UserOTP.findOne({ email });
+
+    if(!user){
+        return res.status(400).json({message: "User doesn't exists"})
+    }
+
+    if (!sentOtp || sentOtp.otp !== otp || Date.now() > sentOtp.otpExpires) {
         return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
     }
 
