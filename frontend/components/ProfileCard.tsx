@@ -18,6 +18,7 @@ import {
 import DeleteAccountButton from "./DeleteAccountButton";
 import { Button } from "./ui/button";
 import { useAuthContext } from "@/hooks/useAuthContext";
+import EditProfileButton from "./EditProfileButton";
 
 
 export interface ProfileInfo {
@@ -63,7 +64,7 @@ export default function ProfileCard({_id, username, pfp, bio }: ProfileInfo){
       <CardFooter className="flex justify-end">
         {(user.username === username) && (
           <>
-            {/* <EditProfileButton /> */}
+            <EditProfileButton />
             <DeleteAccountButton /> 
             {/* <Button>Delete</Button> */}
           </>

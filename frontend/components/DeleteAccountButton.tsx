@@ -7,7 +7,7 @@ import { useLogout } from '@/hooks/useLogout';
 // Define interfaces for better type safety
 interface UserData {
   token: string;
-  _id: string;
+  userId: string;
   username: string;
 }
 
@@ -30,7 +30,7 @@ const DeleteAccountButton = () => {
   const userData = localStorage.getItem('user');
   const parsedUserData: UserData | null = userData ? JSON.parse(userData) : null;
   const token = parsedUserData?.token || null;
-  const userId = parsedUserData?._id || null;
+  const userId = parsedUserData?.userId;
   const username = parsedUserData?.username || null;
 
   const handleClick = async () => {
@@ -66,8 +66,8 @@ const DeleteAccountButton = () => {
           // Delete all posts
           await Promise.all(
             posts.map((post) =>
-              axios.delete(`http://localhost:3001/api/posts/${post._id}`, {
-                headers: { Authorization: `Bearer ${token}` },
+              axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/post/${post._id}`, {
+                headers: { Authorization: `Bearer ${token}`},
               })
             )
           );
@@ -75,7 +75,7 @@ const DeleteAccountButton = () => {
         }
 
         // Delete user account
-        const response = await axios.delete(`http://localhost:3001/api/users/${userId}`, {
+        const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/user/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
