@@ -17,7 +17,7 @@ This is a web forum app similar to Twitter(X) where I use the MERN stack to deve
 
 ## 🛠️ Tech Stack
 
-**Frontend:** React, TailwindCSS, Typescript
+**Frontend:** React, TailwindCSS, Typescript  
 **Backend:** Node.js, Express, Multer, Firebase  
 **Database:** MongoDB
 
