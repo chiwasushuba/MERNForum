@@ -50,12 +50,6 @@ const userSchema = new Schema({
 
 userSchema.statics.signup = async function(username, password){
 
-  // if username == null
-  // if password == null
-  // if (!validator.isEmail(email)) {
-  //   return res.status(400).json({ error: "Invalid email format" });
-  // }
-
   if(!username || !password){
     throw Error("Both fields must be filled")
   } 

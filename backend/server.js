@@ -28,7 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 
-// IMPORTANT: Serve static files from uploads directory
+// IMPORTANT: Serve static files from uploads directory (for multer)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Middleware

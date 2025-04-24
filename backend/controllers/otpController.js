@@ -2,27 +2,32 @@
 const User = require("../models/userModel")
 const otpGenerator = require("otp-generator");
 const nodemailer = require("nodemailer");
+const validator = require("validator")
 const UserOTP = require("../models/userOTPModel"); // Create a Mongoose model for OTPs
 
 const sendOtp = async (req, res) => {
     const {email } = req.body;
+
+
+    // Just an error check to tell the user to input a correct email format
+    if (!validator.isEmail(email)) {
+        return res.status(400).json({ error: "Invalid email format" });
+    }
+
     const exists = await User.findOne({ email });
 
     if(exists){
         return res.status(400).json({ message: "Email already used by other user choose another!" });
     }
 
-  // this generates the otp
   const otp = otpGenerator.generate(6, { upperCaseAlphabets: true, specialChars: false }).toUpperCase();
 
   try {
     
     let userOtp = await UserOTP.findOne({ email });
     
-    // console.log(userOtp) //debug user di ko makita kanina
 
-
-    // Save OTP in the database with expiry time (optional)
+    // Save OTP in the database with expiry time to be removed sa database(optional)
     if (!userOtp) {
         userOtp = await UserOTP.create({email, otp, otpExpires: Date.now() + 300000 });
     } else {
@@ -42,22 +47,28 @@ const sendOtp = async (req, res) => {
       }
   });
 
-  const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: "Your OTP Code",
-      text: `Use this OTP to verify your account: ${otp}. It expires in 15 minutes.`
-  };
 
-  
-      await transporter.sendMail(mailOptions, (error, info) =>{
-        if (error) {
-            console.error("Error:", error);
-        } else {
-            console.log("Email sent:", info.response);
-        }
-      });
-      res.json({ success: true, message: "OTP sent to email", otp: otp });
+    // Configure Mail Options 
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "Your OTP Code",
+        text: `Use this OTP to verify your account: ${otp}. It expires in 15 minutes.`
+    };
+
+
+
+    // This is the part where it actually send the mail
+    await transporter.sendMail(mailOptions, (error, info) =>{
+    if (error) {
+        console.error("Error:", error);
+    } else {
+        console.log("Email sent:", info.response);
+    }
+    });
+
+    res.json({ success: true, message: "OTP sent to email", otp: otp });
+
   } catch (error) {
         console.error("sendOtp error:", error);
         res.status(500).json({ success: false, message: "Error sending OTP" });
@@ -71,6 +82,7 @@ const verifyOtp = async (req, res) => {
     // EMAILS are unique
     const {username, email, otp } = req.body;
 
+    // Checks if there is even an existing user that's been inputted (although it's impossible pero sa backend needed)
     const user = await User.findOne({username});
 
     const sentOtp = await UserOTP.findOne({ email });
@@ -99,7 +111,7 @@ const verifyOtp = async (req, res) => {
 
 
 
-// get the existing otps
+// Get all the existing otps
 const getCurrentOtp = async (req, res) => {
     const otps = await UserOTP.find()
 
