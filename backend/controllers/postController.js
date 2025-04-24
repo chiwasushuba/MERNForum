@@ -51,12 +51,19 @@ const createPost = async (req, res) => {
 
       await new Promise((resolve, reject) => {
         blobStream.on("error", (error) => reject(error));
-        blobStream.on("finish", () => {
-          // Generate public URL for the uploaded file
-          image = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
-          resolve();
+        blobStream.on("finish", async () => {
+          try {
+            await blob.makePublic(); // ✅ Make the file public after it's uploaded
+      
+            // Generate public URL
+            image = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+            resolve();
+          } catch (err) {
+            reject(err); // If makePublic fails
+          }
         });
-        blobStream.end(req.file.buffer); // Send file buffer to Firebase
+      
+        blobStream.end(req.file.buffer);
       });
     }
 
