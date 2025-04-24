@@ -1,5 +1,6 @@
 const mongoose = require("mongoose")
 const Post = require("../models/postModel")
+const { bucket } = require("../utils/firebase");
 
 const getPosts = async (req, res) => {
   const posts = await Post.find().populate("user", "username profile").sort({ createdAt: -1 }); // Populate usernames for all posts
@@ -39,7 +40,24 @@ const createPost = async (req, res) => {
     let image = ''
 
     if(req.file){
-      image = `/uploads/${req.file.filename}`
+      const fileName = `${user._id}/${Date.now()}-${req.file.originalname}`;
+      const blob = bucket.file(fileName);
+
+      const blobStream = blob.createWriteStream({
+        metadata:{
+          contentType: req.file.mimetype,
+        },
+      })
+
+      await new Promise((resolve, reject) => {
+        blobStream.on("error", (error) => reject(error));
+        blobStream.on("finish", () => {
+          // Generate public URL for the uploaded file
+          image = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+          resolve();
+        });
+        blobStream.end(req.file.buffer); // Send file buffer to Firebase
+      });
     }
 
     // If there was a file upload error (added by Multer)

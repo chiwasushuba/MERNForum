@@ -96,7 +96,7 @@ const PostPreview: React.FC<PostInterface> = ({
       <CardContent>
         <p className="text-gray-700 mb-4">{content}</p>
         {image && <Image 
-          src={`${process.env.NEXT_PUBLIC_API_URL}${image}`} 
+          src={image} 
           alt="Post image" 
           width={500} 
           height={300} 

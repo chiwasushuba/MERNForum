@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const express = require("express");
 
-
 const userRoutes = require('./routes/userRoute');
 const postRoutes = require('./routes/postRoute');
 const otpRoutes = require("./routes/otpRoute")
