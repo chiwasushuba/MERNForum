@@ -59,6 +59,7 @@ export default function Home() {
                 author={post.user}
                 profile={post.user.profile}
                 content={post.content}
+                image={post.image}
               />
             ))}
             <div className="fixed bottom-5 right-75">

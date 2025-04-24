@@ -66,6 +66,7 @@ const Page = () => {
                 author={post.user}
                 profile={post.user.profile}
                 content={post.content}
+                image={post.image}
               />
             ))}
 

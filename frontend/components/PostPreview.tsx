@@ -8,6 +8,7 @@ import { usePostsContext } from '@/hooks/usePostsContext';
 import { useAuthContext } from '@/hooks/useAuthContext';
 import { ThumbsDown, ThumbsUp } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image'
 
 interface Author {
   _id: string;
@@ -21,6 +22,7 @@ export interface PostInterface {
   author: Author;
   profile: string;
   content: string;
+  image: string;
   likes?: number;
   dislikes?: number;
   onLike?: () => void;
@@ -34,7 +36,8 @@ const PostPreview: React.FC<PostInterface> = ({
   title, 
   author,
   profile,
-  content, 
+  content,
+  image, 
   likes = 0, 
   dislikes = 0,
   onLike,
@@ -91,7 +94,13 @@ const PostPreview: React.FC<PostInterface> = ({
         </div>
       </CardHeader>
       <CardContent>
-        <p className="text-gray-700">{content}</p>
+        <p className="text-gray-700 mb-4">{content}</p>
+        {image && <Image 
+          src={`${process.env.NEXT_PUBLIC_API_URL}${image}`} 
+          alt="Post image" 
+          width={500} 
+          height={300} 
+        />}
       </CardContent>
       <CardFooter className="flex gap-4">
         <div className="flex items-center gap-1">
