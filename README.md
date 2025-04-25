@@ -10,7 +10,7 @@ This is a web forum app similar to Twitter(X) where I use the MERN stack to deve
 ## 📂 Features
 
 - OTP verification for email
-- Cloud Storage (Firebase)
+- Cloud Storage (Firebase) Read and Write in cloud storage
 - Sign up and Logging in and out
 - Basic CRUD for the profile, posts, and comments
 - Hashed Passwords
@@ -35,6 +35,11 @@ This is a web forum app similar to Twitter(X) where I use the MERN stack to deve
 - EMAIL_USER=joshuaprogrammingnotes@gmail.com
 - EMAIL_PASS=(passApp in google)
 
+### For my cloud storage (firebase)
+- FIREBASE_PROJECT_ID
+- FIREBASE_PRIVATE_KEY_ID
+- FIREBASE_PRIVATE_KEY
+- FIREBASE_CLIENT_EMAIL
 
 # Add a env.local file [FRONTEND] (.env.local)
 - NEXT_PUBLIC_API_URL=http://localhost:4000
