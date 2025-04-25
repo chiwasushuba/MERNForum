@@ -12,7 +12,7 @@ import {useSignup} from '@/hooks/useSignup'
 const Signup = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const {signup, error ,isLoading} = useSignup()
+  const {signup, error} = useSignup()
 
   const handleSubmit = async (e: React.FormEvent) => {
     // e.preventDefault();

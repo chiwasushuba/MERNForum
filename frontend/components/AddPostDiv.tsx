@@ -21,7 +21,7 @@ const AddPostDiv = ({ setIsOpen } : any) => {
   const [content, setContent] = useState('')
   const [image, setImage] = useState<File | null>(null); // Changed to null for consistency
   const [imagePreview, setImagePreview] = useState('') // Added for image preview
-  const { createPost, error, isLoading } = useCreatePost()
+  const { createPost, isLoading } = useCreatePost()
   const [openImageBtn, setIsOpenImageBtn] = useState(false)
 
   // Handles memory leak

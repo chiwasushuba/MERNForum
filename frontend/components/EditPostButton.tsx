@@ -50,7 +50,7 @@ export default function EditPostEvent({ postId, isOpen, setIsOpen }: EditPostEve
         }
 
         try {   
-            await axios.patch(`http://localhost:3001/api/posts/${postId}`, body, {
+            await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/api/posts/${postId}`, body, {
                 headers: { Authorization: `Bearer ${token}` }
             });
         } catch (error) {

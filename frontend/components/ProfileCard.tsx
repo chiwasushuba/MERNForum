@@ -16,7 +16,7 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar"
 import DeleteAccountButton from "./DeleteAccountButton";
-import { Button } from "./ui/button";
+// import { Button } from "./ui/button";
 import { useAuthContext } from "@/hooks/useAuthContext";
 import EditProfileButton from "./EditProfileButton";
 

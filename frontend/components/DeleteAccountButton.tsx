@@ -16,10 +16,10 @@ interface Post {
   // Add other post properties as needed
 }
 
-interface Comment {
-  _id: string;
-  // Add other comment properties as needed
-}
+// interface Comment {
+//   _id: string;
+//   // Add other comment properties as needed
+// }
 
 const DeleteAccountButton = () => {
   const router = useRouter();
@@ -31,7 +31,7 @@ const DeleteAccountButton = () => {
   const parsedUserData: UserData | null = userData ? JSON.parse(userData) : null;
   const token = parsedUserData?.token || null;
   const userId = parsedUserData?.userId;
-  const username = parsedUserData?.username || null;
+  // const username = parsedUserData?.username || null;
 
   const handleClick = async () => {
     const confirm = window.confirm("Are you sure you want to delete your account?");

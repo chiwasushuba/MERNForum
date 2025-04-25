@@ -14,7 +14,6 @@ interface VerifyProps {
 
 const VerifyOTPDiv: React.FC<VerifyProps> = ({ username, email }) => {
   const [otp, setOtp] = useState<string>("")
-  const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState("")
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
