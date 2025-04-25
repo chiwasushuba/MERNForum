@@ -8,7 +8,6 @@ import { motion } from 'framer-motion'
 import Link from 'next/link';
 import React, { useState } from 'react';
 import {useLogin} from '@/hooks/useLogin'
-import { useLogout } from '@/hooks/useLogout';
 import { useRouter } from 'next/navigation';
 
 const Login = () => {
@@ -16,12 +15,9 @@ const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const {login, error} = useLogin()
-  const {logout} = useLogout();
   
 
-  const handleLogout = () =>{
-    logout()
-  }
+ 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
