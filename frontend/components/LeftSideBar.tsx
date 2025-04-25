@@ -30,31 +30,31 @@ const LeftSideBar = () => {
           </div>
 
           <nav className="flex flex-col gap-2 ml-3">
-            <a href="/" className="p-2 hover:bg-gray-200 rounded">
+            <Link href="/" className="p-2 hover:bg-gray-200 rounded">
               Home
-            </a>
+            </Link>
 
             <Link href={`/profile?id=${userId}`} className="p-2 hover:bg-gray-200 rounded">
               Profile
             </Link>
-            <a href="/settings" className="p-2 hover:bg-gray-200 rounded">
+            <Link href="/settings" className="p-2 hover:bg-gray-200 rounded">
               Settings
-            </a>
-            <a href="#" className="p-2 hover:bg-gray-200 rounded">
+            </Link>
+            <Link href="#" className="p-2 hover:bg-gray-200 rounded">
               Messages
-            </a>
-            <a href="#" className="p-2 hover:bg-gray-200 rounded">
+            </Link>
+            <Link href="#" className="p-2 hover:bg-gray-200 rounded">
               Notifications
-            </a>
+            </Link>
           </nav>
 
           <div className="flex mt-auto">
-            <a
+            <Link
               onClick={handleLogout} 
               href="/login" 
               className="p-2 w-full hover:bg-gray-200 rounded">
               Logout
-            </a>
+            </Link>
           </div>
         </div>
       </div>

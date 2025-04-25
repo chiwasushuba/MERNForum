@@ -16,7 +16,11 @@ import { X, ImageIcon } from 'lucide-react'
 import { useCreatePost } from "../hooks/useCreatePost"
 import { Textarea } from './ui/textarea'
 
-const AddPostDiv = ({ setIsOpen } : any) => {
+interface AddPostDivProps {
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const AddPostDiv = ({ setIsOpen } : AddPostDivProps) => {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [image, setImage] = useState<File | null>(null); // Changed to null for consistency
@@ -36,9 +40,10 @@ const AddPostDiv = ({ setIsOpen } : any) => {
 
   
   // Fixed handleImageChange function
-  const handleImageChange = (e: any) => {
-    const file = e.target.files[0]; // Fixed: files not file
-    
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+    const file = e.target.files?.[0]; // Fixed: files not file
+  
     if (file) {
       setImage(file) // Store the actual file object
       
@@ -48,7 +53,7 @@ const AddPostDiv = ({ setIsOpen } : any) => {
     }
   }
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async () => {
     // e.preventDefault(); // Added to prevent default form submission
     
     if (!title.trim() || !content.trim()) {

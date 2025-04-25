@@ -12,7 +12,7 @@ import VerifyOTPDiv from '@/components/VerifyOTPDiv'
 
 
 
-const page = () => {
+const Settings = () => {
   // const searchParams = useSearchParams();
   // const userId = searchParams.get("id");
   const [username, setUsername] = useState("");
@@ -97,4 +97,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Settings

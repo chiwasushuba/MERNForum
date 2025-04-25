@@ -13,7 +13,16 @@ interface UserData {
 
 interface Post {
   _id: string;
-  // Add other post properties as needed
+  title: string;
+  content: string;
+  image: string;
+  user : {
+    _id: string
+    profile: string;
+    username: string;
+  };
+  likes: number;
+  dislikes: number;
 }
 
 // interface Comment {
@@ -44,7 +53,7 @@ const DeleteAccountButton = () => {
 
       try {
         // Fetch all posts of the user
-        const { data: posts } = await axios.get<Post[]>(`http://localhost:4000/api/user/post/${userId}`);
+        const { data: posts } = await axios.get<Post[]>(`${process.env.NODE_PUBLIC_API_URL}/api/user/post/${userId}`);
 
 
         // Fetch all user replies
@@ -59,8 +68,6 @@ const DeleteAccountButton = () => {
         //   });
         //   console.log(`All comments by ${username} have been deleted`);
         // }
-
-        console.log("Deleting posts:", posts.map((post: any) => post._id));
 
         if (posts.length > 0) {
           // Delete all posts

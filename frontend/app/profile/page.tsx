@@ -7,7 +7,6 @@ import RightSideBar from "@/components/RightSideBar";
 import ProfileCard from "@/components/ProfileCard";
 import axios from "axios";
 import PostPreview from "@/components/PostPreview";
-import { Author } from "next/dist/lib/metadata/types/metadata-types";
 
 
 interface Post {
@@ -37,7 +36,7 @@ interface UserDetails {
 }
 
 
-const Page = () => {
+const Profile = () => {
   const searchParams = useSearchParams();
   const userId = searchParams.get("id");
   const [userDetails, setUserDetails] = useState<UserDetails>();
@@ -86,7 +85,7 @@ const Page = () => {
         <div className="w-200">
           {userDetails && (
               <ProfileCard
-                _id={userDetails._id}
+                // _id={userDetails._id}
                 username={userDetails.username}
                 bio={userDetails.bio}
                 pfp={userDetails.profile}
@@ -118,4 +117,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default Profile;

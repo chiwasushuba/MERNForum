@@ -22,13 +22,12 @@ import EditProfileButton from "./EditProfileButton";
 
 
 export interface ProfileInfo {
-  _id: string;
   username: string;
   pfp: string;
   bio: string;
 }
 
-export default function ProfileCard({_id, username, pfp, bio }: ProfileInfo){
+export default function ProfileCard({username, pfp, bio }: ProfileInfo){
 
   const {userInfo} = useAuthContext() 
   

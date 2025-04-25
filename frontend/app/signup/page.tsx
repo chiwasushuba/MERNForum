@@ -3,7 +3,6 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@radix-ui/react-label';
-import { Eye, EyeOff } from 'lucide-react'
 import { motion } from 'framer-motion'
 import Link from 'next/link';
 import React, { useState } from 'react';
@@ -14,12 +13,14 @@ const Signup = () => {
   const [password, setPassword] = useState('');
   const {signup, error} = useSignup()
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async () => {
     // e.preventDefault();
 
-    const user = {username, password };
+    // const user = {username, password };
 
-    const response = await signup(username ,password)
+    // const response = await signup(username ,password)
+
+    await signup(username ,password)
 
     if(error == null){
       setUsername('');

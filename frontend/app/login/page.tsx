@@ -27,7 +27,9 @@ const Login = () => {
     e.preventDefault();
 
     try{
-      const response = await login(username ,password)
+      // const response = await login(username ,password)
+
+      await login(username ,password)
 
       if(error == null){
         setUsername('');
@@ -35,6 +37,7 @@ const Login = () => {
         router.push('/');
       } 
     } catch(e){
+      console.error(e)
       console.error("Login Failed:", error);
     }
   };

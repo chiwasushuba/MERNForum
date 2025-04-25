@@ -36,13 +36,13 @@ const VerifyOTPDiv: React.FC<VerifyProps> = ({ username, email }) => {
         } else if (response.status === 400){
           alert(response.data.message)
         } 
-      } catch (err: any){
+      } catch (err: unknown){
 
         console.error(err)
-        if (err.response) {
-          setError(err.response.data.message || "Failed to send OTP.")
+        if (axios.isAxiosError(err)) {
+          setError(err.response?.data.message || "Failed to send OTP.") // safe my personal errors (400)
         } else {
-          setError("Network error or server not reachable.")
+          setError("Unexpected Error.")
         }
       }
     }
