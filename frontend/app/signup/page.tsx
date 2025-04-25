@@ -22,7 +22,7 @@ const Signup = () => {
 
     await signup(username ,password)
 
-    if(error == null){
+    if(!error){
       setUsername('');
       setPassword('');
       alert("User created successfully!"); // Or redirect user, etc.

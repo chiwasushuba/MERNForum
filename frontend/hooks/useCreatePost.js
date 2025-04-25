@@ -6,13 +6,13 @@ export const useCreatePost = () => {
   const [error, setError] = useState(null)
   const [isLoading, setIsLoading] = useState(null)
   const {dispatch} = usePostsContext()
-  const {user} = useAuthContext();
+  const {userInfo} = useAuthContext();
 
   const createPost = async (title, content, imageFile) => {
     setIsLoading(true)
     setError(null)
 
-    if(!user){
+    if(!userInfo){
       setError("You must be logged in")
       setIsLoading(false)
       return
@@ -31,7 +31,7 @@ export const useCreatePost = () => {
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/post`, {
         method: "POST",
-        headers: {"Authorization": `Bearer ${user.token}`},
+        headers: {"Authorization": `Bearer ${userInfo.token}`},
         body: formData
   
       })
@@ -45,6 +45,7 @@ export const useCreatePost = () => {
   
       if(response.ok){
         dispatch({type: "CREATE_POST", payload: json})
+        return json;
       }  
 
     } catch(e){

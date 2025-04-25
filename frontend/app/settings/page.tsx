@@ -48,11 +48,11 @@ const Settings = () => {
           setIsOpen(true)
           alert(`Alert sent to: ${email}`)
         } 
-      } catch (err: any) {
-        if (err.response) {
-          setError(err.response.data.message || "Failed to send OTP.")
+      } catch (err: unknown) {
+        if (axios.isAxiosError(err)) {
+          setError(err.response?.data.message || "Failed to send OTP.") // yung akin na errors
         } else {
-          setError("Network error or server not reachable.")
+          setError("Unknown Error occured.")
         }
   
         console.error("OTP sending error:", err)

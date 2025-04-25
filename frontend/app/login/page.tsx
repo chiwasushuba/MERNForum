@@ -86,9 +86,6 @@ const Login = () => {
                 >
                   <EyeOff size={20} />
                 </button>
-                <Button onClick={handleLogout} variant={'outline'}>
-                  Logout
-                </Button>
               </div>
             </div>
 

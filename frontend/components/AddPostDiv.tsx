@@ -62,14 +62,17 @@ const AddPostDiv = ({ setIsOpen } : AddPostDivProps) => {
 
     try {
       // Pass the actual file object to createPost
-      await createPost(title, content, image)
+      const response = await createPost(title, content, image)
       
       // Reset form after successful submission
-      setTitle('')
-      setContent('')
-      setImage(null)
-      setImagePreview('')
-      setIsOpenImageBtn(false)
+      if (response.ok){
+        setTitle('')
+        setContent('')
+        setImage(null)
+        setImagePreview('')
+        setIsOpenImageBtn(false)
+      } 
+      
       
       alert("Successfully posted a post")
     } catch (err) {

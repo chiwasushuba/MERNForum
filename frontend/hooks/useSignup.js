@@ -20,7 +20,8 @@ export const useSignup = () => {
 
     if(!response.ok){
       setIsLoading(false)
-      setError(json.error)
+      const stringJson = JSON.stringify(json.error)
+      setError(stringJson)
     }
 
     if(response.ok){
