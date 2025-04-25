@@ -3,9 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import {PostContextProvider} from "../context/PostContext"
 import {AuthContextProvider} from "../context/AuthContext"
-import { useAuthContext } from "@/hooks/useAuthContext";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { RouteGuard } from "./RouteGuard";
 
 const geistSans = Geist({

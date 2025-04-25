@@ -2,9 +2,8 @@
 
 import React, {useEffect, useState} from 'react'
 import axios from 'axios'
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { useSearchParams } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import LeftSideBar from '@/components/LeftSideBar'
 import RightSideBar from '@/components/RightSideBar'
@@ -14,8 +13,8 @@ import VerifyOTPDiv from '@/components/VerifyOTPDiv'
 
 
 const page = () => {
-  const searchParams = useSearchParams();
-  const userId = searchParams.get("id");
+  // const searchParams = useSearchParams();
+  // const userId = searchParams.get("id");
   const [username, setUsername] = useState<any>(null);
   const [email, setEmail] = useState('');
   const [isOpen, setIsOpen] = useState(false);

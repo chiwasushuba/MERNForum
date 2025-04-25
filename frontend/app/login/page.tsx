@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@radix-ui/react-label';
-import { Eye, EyeOff } from 'lucide-react'
+import { EyeOff } from 'lucide-react'
 import { motion } from 'framer-motion'
 import Link from 'next/link';
 import React, { useState } from 'react';
@@ -15,7 +15,7 @@ const Login = () => {
   const router = useRouter();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const {login, error ,isLoading} = useLogin()
+  const {login, error} = useLogin()
   const {logout} = useLogout();
   
 
