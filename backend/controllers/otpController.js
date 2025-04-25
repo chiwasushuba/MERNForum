@@ -87,13 +87,8 @@ const verifyOtp = async (req, res) => {
 
     const sentOtp = await UserOTP.findOne({ email });
 
-    const userStringify = JSON.stringify(user)
     if(!user){
         return res.status(400).json({message: "User doesn't exists"})
-    }
-
-    if(!userStringify.email){
-        return res.status(400).json({message: "User already has an email"})
     }
 
     if (!sentOtp || sentOtp.otp !== otp || Date.now() > sentOtp.otpExpires) {
