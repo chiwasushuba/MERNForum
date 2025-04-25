@@ -30,7 +30,7 @@ export interface ProfileInfo {
 
 export default function ProfileCard({_id, username, pfp, bio }: ProfileInfo){
 
-  const {user} = useAuthContext() 
+  const {userInfo} = useAuthContext() 
   
   return (
     <Card className="w-full">
@@ -62,7 +62,7 @@ export default function ProfileCard({_id, username, pfp, bio }: ProfileInfo){
         </form>
       </CardContent>
       <CardFooter className="flex justify-end">
-        {(user.username === username) && (
+        {(userInfo.username === username) && (
           <>
             <EditProfileButton />
             <DeleteAccountButton /> 

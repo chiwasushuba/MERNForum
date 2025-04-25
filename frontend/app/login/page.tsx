@@ -26,20 +26,17 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const user = { username, password };
+    try{
+      const response = await login(username ,password)
 
-    const response = await login(username ,password)
-
-
-    if(error == null){
-      setUsername('');
-      setPassword('');
-      router.push('/');
-    } else {
-      // console.log(error);
+      if(error == null){
+        setUsername('');
+        setPassword('');
+        router.push('/');
+      } 
+    } catch(e){
+      console.error("Login Failed:", error);
     }
-
-    
   };
 
   

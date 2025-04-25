@@ -15,13 +15,13 @@ import VerifyOTPDiv from '@/components/VerifyOTPDiv'
 const page = () => {
   // const searchParams = useSearchParams();
   // const userId = searchParams.get("id");
-  const [username, setUsername] = useState<any>(null);
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState("")
 
   useEffect(() => {
-    const localUser = localStorage.getItem('user')
+    const localUser = localStorage.getItem('userInfo')
     if(localUser){
       const parsedUser = JSON.parse(localUser)
       setUsername(parsedUser.username)

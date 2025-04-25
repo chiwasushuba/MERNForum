@@ -11,7 +11,7 @@ import Link from 'next/link';
 import Image from 'next/image'
 import axios from 'axios';
 
-interface Author {
+interface User {
   _id: string;
   username: string;
   profile: string;
@@ -20,7 +20,7 @@ interface Author {
 export interface PostInterface {
   postId: string;
   title: string;
-  author: Author;
+  user: User;
   profile: string;
   content: string;
   image: string;
@@ -33,7 +33,7 @@ export interface PostInterface {
 const PostPreview: React.FC<PostInterface> = ({
   postId,
   title, 
-  author,
+  user,
   profile,
   content,
   image, 
@@ -44,19 +44,19 @@ const PostPreview: React.FC<PostInterface> = ({
   const [dislikeCount, setDislikeCount] = useState(dislikes);
 
 
-  const {user} = useAuthContext() 
+  const {userInfo} = useAuthContext() 
   const {dispatch} = usePostsContext()
-
+  
   const handleDelete = async () => {
 
-    if(!user){
+    if(!userInfo){
       return
     }
 
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/post/${postId}`, {
       method: 'DELETE',
       headers: {
-        "Authorization": `Bearer ${user.token}`,
+        "Authorization": `Bearer ${userInfo.token}`,
       }
     });
 
@@ -80,7 +80,7 @@ const PostPreview: React.FC<PostInterface> = ({
       const res = await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/post/${postId}/like`,
         {},
-        { headers: { Authorization: `Bearer ${user.token}` } }
+        { headers: { Authorization: `Bearer ${userInfo.token}` } }
       );
       setLikeCount(res.data.likes);
       setDislikeCount(res.data.dislikes); // in case dislike was removed
@@ -95,7 +95,7 @@ const PostPreview: React.FC<PostInterface> = ({
       const res = await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/post/${postId}/dislike`,
         {},
-        { headers: { Authorization: `Bearer ${user.token}` } }
+        { headers: { Authorization: `Bearer ${userInfo.token}` } }
       );
       setLikeCount(res.data.likes);     // in case like was removed
       setDislikeCount(res.data.dislikes);
@@ -114,14 +114,14 @@ const PostPreview: React.FC<PostInterface> = ({
       
         <h2 className="text-2xl font-bold">{title}</h2>
         <div className="flex items-center gap-2">
-          <Link href={`/profile?id=${author._id}`}>
+          <Link href={`/profile?id=${user._id}`}>
             <Avatar>
               <AvatarImage className="size-8 rounded-full" src={profile} />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
           </Link>
-          <Link href={`/profile?id=${author._id}`} className="hover:underline text-sm font-medium text-gray-500">
-            {author.username}
+          <Link href={`/profile?id=${user._id}`} className="hover:underline text-sm font-medium text-gray-500">
+            {user.username}
           </Link>
         </div>
       </CardHeader>
@@ -156,7 +156,7 @@ const PostPreview: React.FC<PostInterface> = ({
         </div>
 
         {/* Appears only when it's authorized/owner */}
-        {user?.username === author.username && (<Button 
+        {userInfo?.username === user.username && (<Button 
           variant="destructive" 
           onClick={handleDelete}
           className='hover:bg-red-400'

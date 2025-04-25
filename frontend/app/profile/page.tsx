@@ -7,22 +7,48 @@ import RightSideBar from "@/components/RightSideBar";
 import ProfileCard from "@/components/ProfileCard";
 import axios from "axios";
 import PostPreview from "@/components/PostPreview";
+import { Author } from "next/dist/lib/metadata/types/metadata-types";
+
+
+interface Post {
+  _id: string;
+  title: string;
+  content: string;
+  image: string;
+  user : {
+    _id: string
+    profile: string;
+    username: string;
+  };
+  likes: number;
+  dislikes: number;
+}
+
+interface UserDetails {
+  _id: string;
+  email: string,
+  username: string,
+  password: string,
+  profile: string,
+  bio: string,
+  followers: number,
+  following: number,
+  verified: boolean,
+}
 
 
 const Page = () => {
   const searchParams = useSearchParams();
   const userId = searchParams.get("id");
-  const [user, setUser] = useState<any>(null);
+  const [userDetails, setUserDetails] = useState<UserDetails>();
   const [loading, setLoading] = useState<boolean>(true);
-  const [posts, setPosts] = useState<any>(null)
+  const [posts, setPosts] = useState<Post[]>()
 
   console.log(userId)
 
   useEffect(() => {
-    if (!userId) {
-      console.error("No user ID found in URL");
-      setLoading(false);
-      return;
+    if(!userId){
+      setLoading(false)
     }
 
     const fetchEverything = async () => {
@@ -34,7 +60,7 @@ const Page = () => {
         
         ])
         if (userResp.status === 200 && postResp.status === 200) {
-          setUser(userResp.data); // setUser() the json that was recieved in the backend
+          setUserDetails(userResp.data); // setUser() the json that was recieved in the backend
           setPosts(postResp.data);
         }
       } catch (error) {
@@ -44,7 +70,10 @@ const Page = () => {
       }
     };
 
-    fetchEverything()
+    if(userId){
+      fetchEverything()
+    }
+    
 
   }, [userId]);
 
@@ -55,16 +84,23 @@ const Page = () => {
       <LeftSideBar />
       <div className="flex flex-col">
         <div className="w-200">
-          <ProfileCard _id={user._id} username={user.username} bio={user.bio} pfp={user.profile} />
+          {userDetails && (
+              <ProfileCard
+                _id={userDetails._id}
+                username={userDetails.username}
+                bio={userDetails.bio}
+                pfp={userDetails.profile}
+              />
+            )}
           <div className="flex flex-col items-center gap-3 mt-10">
 
             {/* Just want to try this out slice to keep the original array of posts remains unchanged then reverse it */}
-            {posts && posts.slice().reverse().map((post: any) => (
+            {posts && posts.slice().reverse().map((post: Post) => (
               <PostPreview
                 key={post._id}
                 postId={post._id}
                 title={post.title}
-                author={post.user}
+                user={post.user}
                 profile={post.user.profile}
                 content={post.content}
                 image={post.image}

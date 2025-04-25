@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { Button } from './ui/button'
-// import CreatePost from './createPost'
 import {useLogout} from '@/hooks/useLogout'
 import Link from 'next/link';
 
@@ -11,7 +9,7 @@ const LeftSideBar = () => {
 
 
   useEffect(() => {
-    const localItem = localStorage.getItem('user')
+    const localItem = localStorage.getItem('userInfo')
     if(localItem){
       const parsedItem = JSON.parse(localItem)
       setUserId(parsedItem.userId)
@@ -49,8 +47,6 @@ const LeftSideBar = () => {
               Notifications
             </a>
           </nav>
-          {/* <CreatePost/> */}
-
 
           <div className="flex mt-auto">
             <a

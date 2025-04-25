@@ -14,7 +14,8 @@ interface VerifyProps {
 
 const VerifyOTPDiv: React.FC<VerifyProps> = ({ username, email }) => {
   const [otp, setOtp] = useState<string>("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
+  const [error, setError] = useState("")
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     console.log("OTP submitted:", otp)
@@ -35,9 +36,15 @@ const VerifyOTPDiv: React.FC<VerifyProps> = ({ username, email }) => {
           alert("Your Account is now verified!!!")
         } else if (response.status === 400){
           alert(response.data.message)
+        } 
+      } catch (err: any){
+
+        console.error(err)
+        if (err.response) {
+          setError(err.response.data.message || "Failed to send OTP.")
+        } else {
+          setError("Network error or server not reachable.")
         }
-      } catch (e){
-        console.error(e)
       }
     }
 
@@ -63,6 +70,7 @@ const VerifyOTPDiv: React.FC<VerifyProps> = ({ username, email }) => {
           <Button type="submit">Submit</Button>
         </form>
       </div>
+      {error && <Label className='text-red-600'>{error}</Label>}
     </div>
   )
 }
