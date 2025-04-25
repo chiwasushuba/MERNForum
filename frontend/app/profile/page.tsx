@@ -58,7 +58,8 @@ const Page = () => {
           <ProfileCard _id={user._id} username={user.username} bio={user.bio} pfp={user.profile} />
           <div className="flex flex-col items-center gap-3 mt-10">
 
-            {posts && posts.map((post: any) => (
+            {/* Just want to try this out slice to keep the original array of posts remains unchanged then reverse it */}
+            {posts && posts.slice().reverse().map((post: any) => (
               <PostPreview
                 key={post._id}
                 postId={post._id}

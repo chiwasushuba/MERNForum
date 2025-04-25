@@ -130,8 +130,9 @@ const PostPreview: React.FC<PostInterface> = ({
         {image && <Image 
           src={image} 
           alt="Post image" 
-          width={500} 
-          height={300} 
+          width={500}
+          height={300}
+          priority 
         />}
       </CardContent>
       <CardFooter className="flex gap-4">
