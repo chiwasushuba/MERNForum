@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import LeftSideBar from "@/components/LeftSideBar";
 import RightSideBar from "@/components/RightSideBar";
@@ -36,44 +36,40 @@ interface UserDetails {
 }
 
 
-const Profile = () => {
+const ProfileContent = () => {
   const searchParams = useSearchParams();
   const userId = searchParams.get("id");
   const [userDetails, setUserDetails] = useState<UserDetails>();
   const [loading, setLoading] = useState<boolean>(true);
-  const [posts, setPosts] = useState<Post[]>()
+  const [posts, setPosts] = useState<Post[]>();
 
-  console.log(userId)
+  console.log(userId);
 
   useEffect(() => {
-    if(!userId){
-      setLoading(false)
+    if (!userId) {
+      setLoading(false);
     }
 
     const fetchEverything = async () => {
-
       try {
-        const [userResp, postResp]= await Promise.all([
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/user/${userId}`), // this is for user
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/user/post/${userId}`) // this is for the posts
-        
-        ])
+        const [userResp, postResp] = await Promise.all([
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/user/${userId}`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/user/post/${userId}`),
+        ]);
         if (userResp.status === 200 && postResp.status === 200) {
-          setUserDetails(userResp.data); // setUser() the json that was recieved in the backend
+          setUserDetails(userResp.data);
           setPosts(postResp.data);
         }
       } catch (error) {
-        console.error("Error fetching user:", error)
+        console.error("Error fetching user:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    if(userId){
-      fetchEverything()
+    if (userId) {
+      fetchEverything();
     }
-    
-
   }, [userId]);
 
   if (loading) return <p>Loading...</p>;
@@ -84,37 +80,42 @@ const Profile = () => {
       <div className="flex flex-col">
         <div className="w-200">
           {userDetails && (
-              <ProfileCard
-                // _id={userDetails._id}
-                username={userDetails.username}
-                bio={userDetails.bio}
-                pfp={userDetails.profile}
-              />
-            )}
+            <ProfileCard
+              username={userDetails.username}
+              bio={userDetails.bio}
+              pfp={userDetails.profile}
+            />
+          )}
           <div className="flex flex-col items-center gap-3 mt-10">
-
-            {/* Just want to try this out slice to keep the original array of posts remains unchanged then reverse it */}
-            {posts && posts.slice().reverse().map((post: Post) => (
-              <PostPreview
-                key={post._id}
-                postId={post._id}
-                title={post.title}
-                user={post.user}
-                profile={post.user.profile}
-                content={post.content}
-                image={post.image}
-                likes={post.likes}
-                dislikes={post.dislikes}
-              />
-            ))}
-
+            {posts &&
+              posts
+                .slice()
+                .reverse()
+                .map((post: Post) => (
+                  <PostPreview
+                    key={post._id}
+                    postId={post._id}
+                    title={post.title}
+                    user={post.user}
+                    profile={post.user.profile}
+                    content={post.content}
+                    image={post.image}
+                    likes={post.likes}
+                    dislikes={post.dislikes}
+                  />
+                ))}
           </div>
-          
         </div>
       </div>
       <RightSideBar />
     </div>
   );
 };
+
+const Profile = () => (
+  <Suspense fallback={<div>Loading Profile...</div>}>
+    <ProfileContent />
+  </Suspense>
+);
 
 export default Profile;

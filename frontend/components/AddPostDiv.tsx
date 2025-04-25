@@ -154,7 +154,7 @@ const AddPostDiv = ({ setIsOpen } : AddPostDivProps) => {
                     {/* Image preview */}
                     {imagePreview && (
                       <div className="relative mt-2">
-                        <img 
+                        <img
                           src={imagePreview || "/placeholder.svg"} 
                           alt="Preview" 
                           className="max-h-[200px] rounded-md object-contain" 
