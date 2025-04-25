@@ -7,7 +7,7 @@ const {
   updateUser,
   login,
   signup,
-  getUserPosts
+  getUserPosts,
 } = require("../controllers/userController")
 
 const router = express.Router()
@@ -33,11 +33,7 @@ router.post('/signup', signup)
 // get all users posts
 router.get(`/post/:id`, getUserPosts)
 
-// like a post 
-router.patch('/like/:id', likePost)
 
-// dislike a post 
-router.patch('/dislike/:id', dislikePost)
 
 
 module.exports = router;

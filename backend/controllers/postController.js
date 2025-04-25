@@ -111,8 +111,99 @@ const updatePost = async (req, res) => {
     return res.status(404).json({error: "Post not found"})
   }
 
-  res.status(200).json(post)
+  res.status(200).json({message: "Post Updated"})
 }
+
+const likePost = async (req, res) => {
+  try {
+      const { id } = req.params;
+      const userId = req.user._id;
+
+      // Find the post by its ID
+      const post = await Post.findById(id);
+      if (!post) {
+          return res.status(404).json({ message: "Post not found" });
+      }
+
+      // Check if the user has already liked or disliked
+      const hasLiked = post.likedBy.includes(userId);
+      const hasDisliked = post.dislikedBy.includes(userId);
+
+      if (hasLiked) {
+          // Remove the like
+          post.likedBy = post.likedBy.filter(id => id.toString() !== userId.toString());
+          post.likes--; // Decrease the like count
+      } else {
+          // If the user has disliked, remove the dislike first
+          if (hasDisliked) {
+              post.dislikedBy = post.dislikedBy.filter(id => id.toString() !== userId.toString());
+              post.dislikes--; // Decrease the dislike count
+          }
+
+          // Add the like
+          post.likedBy.push(userId);
+          post.likes++; // Increase the like count
+      }
+
+      // Save the updated post
+      await post.save();
+
+      // Respond with the updated post
+      return res.json({
+          message: "Like status updated",
+          likes: post.likes,
+          dislikes: post.dislikes
+      });
+
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "An error occurred while updating the like status" });
+  }
+};
+
+
+
+
+const dislikePost = async (req, res) => {
+  try {
+      const { id } = req.params;
+      const userId = req.user._id;
+
+      const post = await Post.findById(id);
+      if (!post) {
+          return res.status(404).json({ message: "Post not found" });
+      }
+
+      const hasDisliked = post.dislikedBy.includes(userId);
+      const hasLiked = post.likedBy.includes(userId);
+
+      if (hasDisliked) {
+          post.dislikedBy = post.dislikedBy.filter(id => id.toString() !== userId.toString());
+          post.dislikes--;
+      } else {
+          if (hasLiked) {
+              post.likedBy = post.likedBy.filter(id => id.toString() !== userId.toString());
+              post.likes--; 
+          }
+
+          post.dislikedBy.push(userId);
+          post.dislikes++; 
+      }
+
+      await post.save();
+
+      return res.json({
+          message: "Dislike status updated",
+          likes: post.likes,
+          dislikes: post.dislikes
+      });
+
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "An error occurred while updating the dislike status" });
+  }
+};
+
 
 
 
@@ -122,5 +213,6 @@ module.exports = {
   createPost,
   deletePost,
   updatePost,
-  
+  likePost,
+  dislikePost
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from './ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
 import { Button } from './ui/button';
@@ -9,6 +9,7 @@ import { useAuthContext } from '@/hooks/useAuthContext';
 import { ThumbsDown, ThumbsUp } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image'
+import axios from 'axios';
 
 interface Author {
   _id: string;
@@ -23,10 +24,8 @@ export interface PostInterface {
   profile: string;
   content: string;
   image: string;
-  likes?: number;
-  dislikes?: number;
-  onLike?: () => void;
-  onDislike?: () => void;
+  likes: number;
+  dislikes: number;
 }
 
 
@@ -38,11 +37,12 @@ const PostPreview: React.FC<PostInterface> = ({
   profile,
   content,
   image, 
-  likes = 0, 
-  dislikes = 0,
-  onLike,
-  onDislike 
+  likes, 
+  dislikes,
 }) => {
+  const [likeCount, setLikeCount] = useState(likes);
+  const [dislikeCount, setDislikeCount] = useState(dislikes);
+
 
   const {user} = useAuthContext() 
   const {dispatch} = usePostsContext()
@@ -73,6 +73,38 @@ const PostPreview: React.FC<PostInterface> = ({
     }
     
   };
+
+  const handleLike = async () => {
+    if (!user) return;
+    try {
+      const res = await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/post/${postId}/like`,
+        {},
+        { headers: { Authorization: `Bearer ${user.token}` } }
+      );
+      setLikeCount(res.data.likes);
+      setDislikeCount(res.data.dislikes); // in case dislike was removed
+    } catch (err) {
+      console.error("Error liking post:", err);
+    }
+  };
+  
+  const handleDislike = async () => {
+    if (!user) return;
+    try {
+      const res = await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/post/${postId}/dislike`,
+        {},
+        { headers: { Authorization: `Bearer ${user.token}` } }
+      );
+      setLikeCount(res.data.likes);     // in case like was removed
+      setDislikeCount(res.data.dislikes);
+    } catch (err) {
+      console.error("Error disliking post:", err);
+    }
+  };
+  
+  
   
 
 
@@ -106,22 +138,20 @@ const PostPreview: React.FC<PostInterface> = ({
         <div className="flex items-center gap-1">
           <button
             className='bg-transparent hover:bg-blue-200 rounded p-2'
-            onClick={onLike} 
-            disabled={!onLike}
+            onClick={handleLike} 
           >
             <ThumbsUp color="#000000" size={18} strokeWidth={3} />
           </button>
-          <span className='text-2xl'>{likes}</span>
+          <span className='text-2xl'>{likeCount}</span>
         </div>
         <div className="flex items-center gap-1">
           <button 
             className='bg-transparent hover:bg-red-200 rounded p-2'
-            onClick={onDislike} 
-            disabled={!onDislike}
+            onClick={handleDislike} 
           >
             <ThumbsDown color="#000000" size={18} strokeWidth={3} />
           </button>
-          <span className='text-2xl'>{dislikes}</span>
+          <span className='text-2xl'>{dislikeCount}</span>
         </div>
 
         {/* Appears only when it's authorized/owner */}

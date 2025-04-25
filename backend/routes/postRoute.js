@@ -6,7 +6,8 @@ const {
   createPost,
   deletePost,
   updatePost,
-
+  likePost,
+  dislikePost,
 } = require("../controllers/postController")
 const requireAuth = require("../middleware/requireAuth")
 const upload = require('../utils/requireUpload');
@@ -34,5 +35,11 @@ router.delete('/:id', deletePost)
 
 // update a post
 router.patch('/:id', updatePost)
+
+// like a post 
+router.patch('/:id/like', likePost)
+
+// dislike a post 
+router.patch('/:id/dislike', dislikePost)
 
 module.exports = router;

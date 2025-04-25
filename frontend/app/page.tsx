@@ -60,6 +60,8 @@ export default function Home() {
                 profile={post.user.profile}
                 content={post.content}
                 image={post.image}
+                likes={post.likes}
+                dislikes={post.dislikes}
               />
             ))}
             <div className="fixed bottom-5 right-75">
