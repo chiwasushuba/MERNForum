@@ -10,9 +10,11 @@ const LeftSideBar = () => {
 
   useEffect(() => {
     const localItem = localStorage.getItem('userInfo')
+    
     if(localItem){
       const parsedItem = JSON.parse(localItem)
       setUserId(parsedItem.userId)
+      // alert(`UserId: ${userId}`)
     } 
   }, [])
   

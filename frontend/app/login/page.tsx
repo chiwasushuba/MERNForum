@@ -3,39 +3,37 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@radix-ui/react-label';
-import { EyeOff } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import { motion } from 'framer-motion'
 import Link from 'next/link';
 import React, { useState } from 'react';
 import {useLogin} from '@/hooks/useLogin'
-import { useRouter } from 'next/navigation';
+import {useRouter} from 'next/navigation';
 
 const Login = () => {
-  const router = useRouter();
+  const [errorOpen ,setErrorOpen] = useState(false)
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const {login, error} = useLogin()
-  
-
+  const router = useRouter()
  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    try{
-      // const response = await login(username ,password)
+    // const response = await login(username ,password)
 
-      await login(username ,password)
+    const resp = await login(username, password)
 
-      if(error == null){
-        setUsername('');
-        setPassword('');
-        router.push('/');
-      } 
-    } catch(e){
-      console.error(e)
-      console.error("Login Failed:", error);
-    }
+  if (!resp.success) {
+    setErrorOpen(true)
+  } else {
+    setErrorOpen(false)
+    setUsername('')
+    setPassword('')
+    router.push('/')
+  }
   };
 
   
@@ -71,22 +69,24 @@ const Login = () => {
               <div className="relative">
                 <Input 
                   id="password" 
-                  type="password" 
+                  type={passwordVisible ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   />
                 <button
                   type="button"
+                  onClick={() => setPasswordVisible(!passwordVisible)} // Toggle password visibility
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
-                  <EyeOff size={20} />
+                  {passwordVisible ? <Eye size={20} /> : <EyeOff size={20} />}
                 </button>
               </div>
             </div>
 
             <Button type="submit" className="w-full hover:bg-gray-600 cursor-pointer">Login</Button>
           </form>
+          {errorOpen && <Label className='text-red-400'>{error}</Label>}
 
           <div className="text-center mt-4">
             <p className="text-muted-foreground">Already have an account?</p>

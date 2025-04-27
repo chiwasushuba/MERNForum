@@ -64,7 +64,7 @@ const ProfileContent = () => {
         console.error("Error fetching user:", error);
       } finally {
         setLoading(false);
-      }
+      } 
     };
 
     if (userId) {

@@ -8,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-// import EditProfileButton from "./edit-profile-button";
 
 import {
   Avatar,
@@ -16,7 +15,6 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar"
 import DeleteAccountButton from "./DeleteAccountButton";
-// import { Button } from "./ui/button";
 import { useAuthContext } from "@/hooks/useAuthContext";
 import EditProfileButton from "./EditProfileButton";
 

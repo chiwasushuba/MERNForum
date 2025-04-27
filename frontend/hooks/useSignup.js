@@ -18,13 +18,11 @@ export const useSignup = () => {
     })
     const json = await response.json()
 
-    if(!response.ok){
+    if(json.error){
       setIsLoading(false)
       const stringJson = JSON.stringify(json.error)
       setError(stringJson)
-    }
-
-    if(response.ok){
+    } else {
       localStorage.setItem('userInfo', JSON.stringify(json))
 
       dispatch({type: "LOGIN", payload: json})

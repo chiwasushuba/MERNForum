@@ -15,6 +15,7 @@ import { Button } from './ui/button'
 import { X, ImageIcon } from 'lucide-react'
 import { useCreatePost } from "../hooks/useCreatePost"
 import { Textarea } from './ui/textarea'
+import { motion } from 'framer-motion'
 
 interface AddPostDivProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -76,8 +77,7 @@ const AddPostDiv = ({ setIsOpen } : AddPostDivProps) => {
       
       alert("Successfully posted a post")
     } catch (err) {
-      console.error("Error creating post:", err)
-      alert("Failed to create post. Please try again.")
+      alert(`Failed to create post. Please try again. ${err}`)
     }
   }
 
@@ -88,7 +88,14 @@ const AddPostDiv = ({ setIsOpen } : AddPostDivProps) => {
   }
 
   return (
-    <div className='fixed inset-0 flex justify-center items-center z-50'>
+    <motion.div 
+        className="fixed inset-0 z-50 flex items-center justify-center"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        transition={{ duration: 0.2 }}
+        >
+    <div className='fixed inset-0 flex justify-center items-center z-50 '>
       {/* className='absolute top-1/2 left-3/5 transform -translate-x-1/2 -translate-y-1/2 w-3/5 min-h-[60%] p-6' */}
       <Card className='w-3/5 min-h-[60%] max-h-[80%] p-6 overflow-y-auto'>
         <CardHeader>
@@ -196,6 +203,7 @@ const AddPostDiv = ({ setIsOpen } : AddPostDivProps) => {
         </form>
       </Card>
     </div>
+    </motion.div>
   )
 }
 
