@@ -26,6 +26,8 @@ const Login = () => {
 
     const resp = await login(username, password)
 
+    console.log(resp)
+
   if (!resp.success) {
     setErrorOpen(true)
   } else {

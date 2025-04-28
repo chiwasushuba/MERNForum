@@ -32,7 +32,7 @@ export const useLogin = () => {
       return { success: true }
       
     } catch (err) {
-      setIsLoading(false)
+      setIsLoading(true)
       setError("Network error")
       return { success: false, error: "Network error" }
     }

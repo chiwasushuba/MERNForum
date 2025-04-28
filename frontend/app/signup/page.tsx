@@ -7,25 +7,31 @@ import { motion } from 'framer-motion'
 import Link from 'next/link';
 import React, { useState } from 'react';
 import {useSignup} from '@/hooks/useSignup'
+import {useRouter} from 'next/navigation';
 
 const Signup = () => {
+  const [errorOpen ,setErrorOpen] = useState(false)
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const {signup, error} = useSignup()
+  const router = useRouter()
 
-  const handleSubmit = async () => {
-    // e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
     // const user = {username, password };
 
-    // const response = await signup(username ,password)
+    const response = await signup(username ,password)
 
-    await signup(username ,password)
+    console.log(response)
 
-    if(!error){
-      setUsername('');
-      setPassword('');
-      alert("User created successfully!"); // Or redirect user, etc.
+    if(!response.success){
+      setErrorOpen(true)// Or redirect user, etc.
+    } else {
+      setErrorOpen(false)
+      setUsername("")
+      setPassword("")
+      router.push("/")
     }
   };
 
@@ -86,6 +92,7 @@ const Signup = () => {
             </div>
             <Button type="submit" className="w-full hover:bg-gray-600 cursor-pointer">Sign-up</Button>
           </form>
+          {errorOpen && <Label className='text-red-400'>{error}</Label>}
 
           <div className="text-center mt-4">
             <p className="text-muted-foreground">Already have an account?</p>
