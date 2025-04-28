@@ -31,25 +31,28 @@ export const useCreatePost = () => {
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/post`, {
         method: "POST",
-        headers: {"Authorization": `Bearer ${userInfo.token}`},
+        headers: {"Authorization": `Bearer ${userInfo.token}`}, 
         body: formData
   
       })
 
-      const json = await response.json()
-
-      if(!response.ok){
-        setIsLoading(false)
-        setError(json.error)
+      const json = await response.json();
+      
+      if (!response.ok) {
+        setIsLoading(false);
+        setError(json.error || "An error occurred.");
+        return;
       }
-  
-      if(response.ok){
-        dispatch({type: "CREATE_POST", payload: json})
-        return json;
-      }  
+
+      // Successfully created the post
+      dispatch({ type: "CREATE_POST", payload: json });
+      setIsLoading(false);
+      return json;
 
     } catch(e){
       console.error(e)
+      setIsLoading(true);
+      setError("An error occurred while creating the post.");
     }
   }
 
