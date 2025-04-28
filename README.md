@@ -6,7 +6,6 @@ This is a web forum app similar to Twitter(X) where I use the MERN stack to deve
 ## 📸 Demo (fully functional finally) 
 
 - https://mernforum-frontend.onrender.com
-- ![Uploading image.png…]()
 
 
 ## 📂 Features
