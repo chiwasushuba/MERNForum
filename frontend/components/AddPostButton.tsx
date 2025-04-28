@@ -4,7 +4,6 @@ import React, {useState} from 'react'
 import { Button } from './ui/button'
 import AddPostDiv from './AddPostDiv';
 import { Plus } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 const AddPostButton = () => {
 

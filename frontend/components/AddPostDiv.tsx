@@ -55,7 +55,7 @@ const AddPostDiv = ({ setIsOpen } : AddPostDivProps) => {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    // e.preventDefault(); // Added to prevent default form submission
+    e.preventDefault(); // Added to prevent default form submission
     e.stopPropagation()
     
     if (!title.trim() || !content.trim()) {
@@ -66,14 +66,17 @@ const AddPostDiv = ({ setIsOpen } : AddPostDivProps) => {
       // Pass the actual file object to createPost
       const response = await createPost(title, content, image)
 
+      console.log(response?.status)
+
       // Reset form after successful submission
-      if (response.status === 200){
+      if (response && response.status == 200){
         alert("Successfully posted a post")
         setTitle('')
         setContent('')
         setImage(null)
         setImagePreview('')
         setIsOpenImageBtn(false)
+        window.location.reload()
       } 
       
       

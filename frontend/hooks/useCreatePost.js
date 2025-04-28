@@ -40,17 +40,16 @@ export const useCreatePost = () => {
       if (!response.ok) {
         setIsLoading(false);
         setError(json.error || "An error occurred.");
-        return;
+        return { status: response.status, data: json };
       }
 
       // Successfully created the post
       dispatch({ type: "CREATE_POST", payload: json });
       setIsLoading(false);
-      return json;
-
+      return { status: response.status, data: json };
     } catch(e){
       console.error(e)
-      setIsLoading(true);
+      setIsLoading(false);
       setError("An error occurred while creating the post.");
     }
   }
