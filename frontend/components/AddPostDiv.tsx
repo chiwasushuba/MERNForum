@@ -54,7 +54,7 @@ const AddPostDiv = ({ setIsOpen } : AddPostDivProps) => {
     }
   }
 
-  const handleSubmit = async (e: React.MouseEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     // e.preventDefault(); // Added to prevent default form submission
     e.stopPropagation()
     
@@ -65,9 +65,10 @@ const AddPostDiv = ({ setIsOpen } : AddPostDivProps) => {
     try {
       // Pass the actual file object to createPost
       const response = await createPost(title, content, image)
-      
+
       // Reset form after successful submission
-      if (response.ok){
+      if (response.status === 200){
+        alert("Successfully posted a post")
         setTitle('')
         setContent('')
         setImage(null)
@@ -76,7 +77,6 @@ const AddPostDiv = ({ setIsOpen } : AddPostDivProps) => {
       } 
       
       
-      alert("Successfully posted a post")
     } catch (err) {
       alert(`Failed to create post. Please try again. ${err}`)
     }
@@ -111,7 +111,7 @@ const AddPostDiv = ({ setIsOpen } : AddPostDivProps) => {
           <CardDescription className='text-xl'>Enter below details about posts</CardDescription>
         </CardHeader>
         
-        <form onSubmit={(e) => {handleSubmit}} encType='multipart/form-data'>
+        <form onSubmit={(e) => {handleSubmit(e)}} encType='multipart/form-data'>
           <CardContent>
             <div className="space-y-4">
               <div className="space-y-2">

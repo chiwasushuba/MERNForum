@@ -11,7 +11,6 @@ const LeftSideBar = () => {
   useEffect(() => {
     const localItem = localStorage.getItem('userInfo')
 
-    console.log(localItem)
     if (!localItem) return;
     
     if(localItem){

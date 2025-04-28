@@ -33,7 +33,6 @@ export const useCreatePost = () => {
         method: "POST",
         headers: {"Authorization": `Bearer ${userInfo.token}`}, 
         body: formData
-  
       })
 
       const json = await response.json();
