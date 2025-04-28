@@ -54,8 +54,9 @@ const AddPostDiv = ({ setIsOpen } : AddPostDivProps) => {
     }
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.MouseEvent) => {
     // e.preventDefault(); // Added to prevent default form submission
+    e.stopPropagation()
     
     if (!title.trim() || !content.trim()) {
       return alert("Title and content are required!")
@@ -110,7 +111,7 @@ const AddPostDiv = ({ setIsOpen } : AddPostDivProps) => {
           <CardDescription className='text-xl'>Enter below details about posts</CardDescription>
         </CardHeader>
         
-        <form onSubmit={handleSubmit} encType='multipart/form-data'>
+        <form onSubmit={(e) => {handleSubmit}} encType='multipart/form-data'>
           <CardContent>
             <div className="space-y-4">
               <div className="space-y-2">
