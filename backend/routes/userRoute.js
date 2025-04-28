@@ -9,6 +9,8 @@ const {
   signup,
   getUserPosts,
 } = require("../controllers/userController")
+const upload = require('../utils/requireUpload');
+
 
 const router = express.Router()
 
@@ -22,7 +24,7 @@ router.get('/:id', getUser)
 router.delete('/:id', deleteUser)
 
 // update a user
-router.patch('/:id', updateUser)
+router.patch('/:id', upload.single("profile"),updateUser)
 
 // login
 router.post('/login', login);

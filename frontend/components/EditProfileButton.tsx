@@ -3,8 +3,7 @@
 import React, {useState} from 'react'
 import { Button } from './ui/button'
 import EditProfileDiv from './EditProfileDiv';
-import { Plus } from 'lucide-react';
-import { motion } from 'framer-motion';
+
 
 const EditProfileButton = () => {
 
@@ -15,7 +14,7 @@ const EditProfileButton = () => {
     
       <Button 
         onClick={() => (setIsOpen(true))}
-        className="ml-2"
+        className="ml-2 hover:bg-opacity-50"
         >
           Edit Profile
       </Button>
