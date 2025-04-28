@@ -9,8 +9,9 @@ import axios, { AxiosError } from 'axios';
 import { useEffect, useState } from "react";
 import { Button } from '@/components/ui/button';
 import { Input } from "./ui/input";
-import { X } from "lucide-react";
+import { ImageIcon, X } from "lucide-react";
 import { motion } from "framer-motion";
+import { Label } from "@radix-ui/react-label";
 
 // Define interface for API error response
 interface ErrorResponse {
@@ -22,13 +23,12 @@ interface AddPostDivProps {
   }
 
 export default function EditProfileButton({ setIsOpen } : AddPostDivProps) {
-    const [newPfp, setNewPfp] = useState<string>('');
     const [newUsername, setNewUsername] = useState<string>('');
     const [newBio, setNewBio] = useState<string>('');
-    const userData = localStorage.getItem('user');
-    const userId = userData ? JSON.parse(userData)._id : null;
+    const userData = localStorage.getItem('userInfo');
+    const userId = userData ? JSON.parse(userData).userId : null;
     const token = userData ? JSON.parse(userData).token : null;
-    const [image, setImage] = useState<File | null>(null);
+    const [newImage, setNewImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState('') 
     const [openImageBtn, setIsOpenImageBtn] = useState(false)
 
@@ -47,27 +47,30 @@ export default function EditProfileButton({ setIsOpen } : AddPostDivProps) {
 
         const file = e.target.files?.[0];
         if (file) {
-            setImage(file) // Store the actual file object
+            setNewImage(file) // Store the actual file object
             
             const previewUrl = URL.createObjectURL(file)
             setImagePreview(previewUrl)
         }
     }
 
-    const handleEdit = async (newPfp: string, newUsername: string, newBio: string, e: React.MouseEvent) => {
+    const handleEdit = async (newUsername: string, newBio: string, e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-    
-        if (!token) {
-            console.error("No token found. User may not be logged in.");
-            return;
-        }
-    
-        const body: { pfp?: string; username?: string; bio?: string } = {};
+
         
-        if (newPfp.trim()) body.pfp = newPfp;
+    
+        // if (!token) {
+        //     console.error("No token found. User may not be logged in.");
+        //     return;
+        // }
+    
+        const body: { profile?: File; username?: string; bio?: string } = {};
+        
         if (newUsername.trim()) body.username = newUsername;
         if (newBio.trim()) body.bio = newBio;
+        if (newImage != null) body.profile = newImage;
+
     
         if (Object.keys(body).length === 0) {
             alert("No changes made.");
@@ -75,12 +78,19 @@ export default function EditProfileButton({ setIsOpen } : AddPostDivProps) {
         }
     
         try {
-            const res = await axios.patch(`${process.env.NODE_PUBLIC_API_URL}/api/users/edit/${userId}`, body, {
-                headers: { Authorization: `Bearer ${token}` },
+            const res = await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/${userId}`, body, {
+                headers: 
+                {   
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                },
+                
             });
         
             if (res.status === 200) 
                 alert("Successfully updated profile");
+            else 
+                alert(res.status)
             
         } catch (error: unknown) {
             const axiosError = error as AxiosError<ErrorResponse>;
@@ -93,7 +103,7 @@ export default function EditProfileButton({ setIsOpen } : AddPostDivProps) {
     };
 
     const removeImage = () => {
-        setImage(null)
+        setNewImage(null)
         setImagePreview('')
       }
     
@@ -118,57 +128,79 @@ export default function EditProfileButton({ setIsOpen } : AddPostDivProps) {
                         </Button>
                     </CardHeader>
                 <CardContent>
-                    Username:
-                    <input
-                        type='text'
-                        className="w-full h-11 mb-1 rounded-md border p-2"
-                        placeholder="johnDoe"
-                        value={newUsername}
-                        onChange={(e) => setNewUsername(e.target.value)}
-                    />
-                    Bio:
-                    <textarea
-                        className="w-full h-40 mb-3 rounded-md border p-2"
-                        placeholder="Write something..."
-                        value={newBio}
-                        onChange={(e) => setNewBio(e.target.value)}
-                    />
-                    Profile Picture:
-                    <Input
-                      id="image"
-                      type='file'
-                      accept="image/*" // Only accept image files
-                      className='w-full'
-                      onChange={handleImageChange} // Use the correct handler
-                    />
-                    {imagePreview && (
-                      <div className="relative mt-2">
-                        <img
-                          src={imagePreview || "/placeholder.svg"} 
-                          alt="Preview" 
-                          className="max-h-[200px] rounded-md object-contain" 
+                    <div>
+                        Username:
+                        <input
+                            type='text'
+                            className="w-full h-11 mb-1 rounded-md border p-2"
+                            placeholder="johnDoe"
+                            value={newUsername}
+                            onChange={(e) => setNewUsername(e.target.value)}
                         />
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="sm"
-                          className="absolute top-2 right-2"
-                          onClick={removeImage}
-                        >
-                          <X size={16} />
-                        </Button>
-                      </div>
-                    )}   
+                    </div>
 
-                    {!imagePreview && (
-                      <Button 
-                        type="button"
-                        variant="outline" 
-                        onClick={() => setIsOpenImageBtn(false)}
-                      >
-                        Cancel
-                      </Button>
-                    )}
+                    <div>
+                        Bio:
+                        <textarea
+                            className="w-full h-40 mb-3 rounded-md border p-2"
+                            placeholder="Write something..."
+                            value={newBio}
+                            onChange={(e) => setNewBio(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        {!openImageBtn ? (
+                        <Button 
+                            type="button"
+                            onClick={() => setIsOpenImageBtn(true)}
+                            className="flex items-center gap-2"
+                        >
+                            <ImageIcon size={16} />
+                            Add Image
+                        </Button>
+                        ) : (
+                        <div className="space-y-2">
+                            <Label >Upload Image</Label>
+                            <Input
+                            type='file'
+                            accept="image/*" // Only accept image files
+                            className='w-full hover:border-4'
+                            onChange={handleImageChange} // Use the correct handler
+                            />
+                            
+                            {/* Image preview */}
+                            {imagePreview && (
+                            <div className="relative mt-2">
+                                <img
+                                src={imagePreview || "/placeholder.svg"} 
+                                alt="Preview" 
+                                className="max-h-[200px] rounded-md object-contain" 
+                                />
+                                <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                className="absolute top-2 right-2"
+                                onClick={removeImage}
+                                >
+                                <X size={16} />
+                                </Button>
+                            </div>
+                            )}
+                            
+                            {!imagePreview && (
+                            <Button 
+                                type="button"
+                                variant="outline" 
+                                onClick={() => setIsOpenImageBtn(false)}
+                            >
+                                Cancel
+                            </Button>
+                            )}
+                        </div>
+                        )}
+                    </div>
                     
                 </CardContent>
                 <CardFooter className="flex justify-between">
@@ -183,7 +215,7 @@ export default function EditProfileButton({ setIsOpen } : AddPostDivProps) {
                         </button>
                         <button 
                             onClick={async (e) => {
-                                await handleEdit(newPfp, newUsername, newBio, e); // Wait for API response
+                                await handleEdit(newUsername, newBio, e); // Wait for API response
                                 setIsOpen(false);
                                 window.location.reload();
                             }} 

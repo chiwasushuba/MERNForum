@@ -43,7 +43,7 @@ const ProfileContent = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [posts, setPosts] = useState<Post[]>();
 
-  console.log(userId);
+  // console.log(userId);
 
   useEffect(() => {
     if (!userId) {
