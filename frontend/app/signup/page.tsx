@@ -8,11 +8,13 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import {useSignup} from '@/hooks/useSignup'
 import {useRouter} from 'next/navigation';
+import { Eye, EyeOff } from 'lucide-react';
 
 const Signup = () => {
   const [errorOpen ,setErrorOpen] = useState(false)
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const {signup, error} = useSignup()
   const router = useRouter()
 
@@ -77,17 +79,18 @@ const Signup = () => {
               <div className="relative">
                 <Input 
                   id="password" 
-                  type="password" 
+                  type={passwordVisible ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   />
-                {/* <button
+                <button
                   type="button"
+                  onClick={() => setPasswordVisible(!passwordVisible)} // Toggle password visibility
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
-                  <EyeOff size={20} />
-                </button> */}
+                  {passwordVisible ? <Eye size={20} /> : <EyeOff size={20} />}
+                </button>
               </div>
             </div>
             <Button type="submit" className="w-full hover:bg-gray-600 cursor-pointer">Sign-up</Button>
