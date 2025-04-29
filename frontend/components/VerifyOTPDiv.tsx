@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@radix-ui/react-label"
 import axios from "axios"
 
+
 interface VerifyProps {
   username: string
   email: string
@@ -32,7 +33,10 @@ const VerifyOTPDiv: React.FC<VerifyProps> = ({ username, email }) => {
         })
   
         if(response.status === 200){
-          alert("Your Account is now verified!!!")
+          const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+          userInfo.verified = true; // Update the 'verified' field
+          localStorage.setItem("userInfo", JSON.stringify(userInfo));
+          alert("Your Account is now verified!")
         } else if (response.status === 400){
           alert(response.data.message)
         } 

@@ -27,6 +27,7 @@ export default function Home() {
 
   const {posts, dispatch} = usePostsContext();
   const {userInfo} = useAuthContext();
+  const userVerifiedVal = userInfo?.verified || false
 
   
   useEffect(() => {
@@ -47,7 +48,6 @@ export default function Home() {
 
     if(userInfo){
       fetchPosts();
-      console.log(userInfo.verified)
     }
   }, [dispatch, userInfo]);
 
@@ -71,7 +71,7 @@ export default function Home() {
                 image={post.image}
                 likes={post.likes}
                 dislikes={post.dislikes}
-                userVerified={userInfo.verified}
+                userVerified={userVerifiedVal}
               />
             ))}
             <div className="fixed bottom-5 right-75">
