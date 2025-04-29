@@ -3,14 +3,17 @@
 
 This is a web forum app similar to Twitter(X) where I use the MERN stack to develop this application to help familiarize how web development works. This helps me get to know Typescript, TailwindCSS, React, NextJS, Node, Express, MongoDB, Nodemailer, Multer, and Firebase for my cloud storage where I store the images for deployment.
 
-## 📸 Demo (not yet fully functional) 
+## 📸 Demo (fully functional finally) 
 
 - https://mernforum-frontend.onrender.com
+
 
 ## 📂 Features
 
 - OTP verification for email
 - Cloud Storage (Firebase) Read and Write in cloud storage
+    - Stored in a folder based on their ID to determine who owns the image (used Data.now() and original filename to name the image)
+    - Processed file uploads using multer that only accepts PNG,JPG, GIF and 5MB of size
 - Sign up and Logging in and out
 - Basic CRUD for the profile, posts
 - Hashed Passwords
