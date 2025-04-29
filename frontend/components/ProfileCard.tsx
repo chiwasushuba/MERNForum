@@ -31,6 +31,10 @@ export interface ProfileInfo {
 export default function ProfileCard({username, pfp, bio, verified}: ProfileInfo){
 
   const {userInfo} = useAuthContext() 
+
+  if (!userInfo) {
+    return <div>User not logged in</div>;
+  }
   
   return (
     <Card className="w-full">

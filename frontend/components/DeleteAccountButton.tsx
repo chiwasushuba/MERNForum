@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import axios, { AxiosError } from 'axios';
 import { useLogout } from '@/hooks/useLogout';
+import { useAuthContext } from "@/hooks/useAuthContext"; 
 
 // Define interfaces for better type safety
 interface UserData {
@@ -16,8 +17,8 @@ interface Post {
   title: string;
   content: string;
   image: string;
-  user : {
-    _id: string
+  user: {
+    _id: string;
     profile: string;
     username: string;
   };
@@ -32,74 +33,56 @@ interface Post {
 
 const DeleteAccountButton = () => {
   const router = useRouter();
-
-
-  const {logout} = useLogout();
-  
-  const userData = localStorage.getItem('user');
-  const parsedUserData: UserData | null = userData ? JSON.parse(userData) : null;
-  const token = parsedUserData?.token || null;
-  const userId = parsedUserData?.userId;
-  // const username = parsedUserData?.username || null;
+  const { logout } = useLogout();
+  const { userInfo } = useAuthContext();
 
   const handleClick = async () => {
     const confirm = window.confirm("Are you sure you want to delete your account?");
 
     if (confirm) {
-      if (!userId || !token) {
+      if (!userInfo.userId || !userInfo.token) {
         console.log("User ID or token not found");
         return;
       }
 
       try {
-        // Fetch all posts of the user
-        const { data: posts } = await axios.get<Post[]>(`${process.env.NODE_PUBLIC_API_URL}/api/user/post/${userId}`);
-
-
-        // Fetch all user replies
-        // const { data: comments } = await axios.get<Comment[]>(`http://localhost:3001/api/posts/user/${userId}/comments`, {
-        //   headers: { Authorization: `Bearer ${token}` },
-        // });
-
-        // if (comments.length > 0) {
-        //   // Delete all comments by user
-        //   await axios.delete(`http://localhost:3001/api/posts/user/${userId}/comments`, {
-        //     headers: { Authorization: `Bearer ${token}` },
-        //   });
-        //   console.log(`All comments by ${username} have been deleted`);
-        // }
+        // Fetch all posts of the user (using destructuring to directly extract posts)
+        const { data: posts } = await axios.get<Post[]>(`${process.env.NEXT_PUBLIC_API_URL}/api/user/post/${userInfo.userId}`);
 
         if (posts.length > 0) {
-          // Delete all posts
+          // Delete all posts in parallel, catching errors for individual deletions
           await Promise.all(
             posts.map((post) =>
               axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/post/${post._id}`, {
-                headers: { Authorization: `Bearer ${token}`},
-              })
+                headers: { Authorization: `Bearer ${userInfo.token}` },
+              }).catch((error) => console.error(`Failed to delete post with ID: ${post._id}`, error))
             )
           );
           console.log("All posts deleted successfully");
         }
 
         // Delete user account
-        const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/user/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
+        const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/user/${userInfo.userId}`, {
+          headers: { Authorization: `Bearer ${userInfo.token}` },
         });
 
         if (response.status === 200) {
           alert('Account deleted successfully');
-          logout()
-          router.push('/login'); // Redirect to login page
+          router.push('/login');
+          logout();
+           // Redirect to login page
         } else {
           console.error('Failed to delete account');
         }
       } catch (error: unknown) {
-        // Properly type the error
-        const axiosError = error as AxiosError;
-        console.error(
-          'Error deleting account:', 
-          axiosError.response?.data || axiosError.message
-        );
+        if (axios.isAxiosError(error)) {
+          console.error(
+            'Error deleting account:', 
+            error.response?.data || error.message
+          );
+        } else {
+          console.error('Unknown error:', error);
+        }
         alert('An error occurred while deleting your account.');
       }
     } else {

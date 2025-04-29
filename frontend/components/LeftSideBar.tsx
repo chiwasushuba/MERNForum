@@ -44,12 +44,7 @@ const LeftSideBar = () => {
             <Link href="/settings" className="p-2 hover:bg-gray-200 rounded">
               Settings
             </Link>
-            <Link href="#" className="p-2 hover:bg-gray-200 rounded">
-              Messages
-            </Link>
-            <Link href="#" className="p-2 hover:bg-gray-200 rounded">
-              Notifications
-            </Link>
+            
           </nav>
 
           <div className="flex mt-auto">

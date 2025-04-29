@@ -105,7 +105,7 @@ const ProfileContent = () => {
                     image={post.image}
                     likes={post.likes}
                     dislikes={post.dislikes}
-                    userVerified={userInfo.verified}
+                    userVerified={userInfo?.verified ?? false}
                   />
                 ))}
           </div>

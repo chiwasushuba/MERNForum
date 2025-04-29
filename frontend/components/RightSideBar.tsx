@@ -12,10 +12,16 @@ const RightSideBar = () => {
           <div className="flex flex-col gap-3">
             <SearchBar/>
             <div className='rounded-sm border-solid border-gray-200 border'>
-              <h3 className="font-bold mb-4">Recent Activity</h3>
-              <p>text</p>
-              <p>text</p>
-              <p>text</p>
+              <h3 className="font-bold mb-4">Features Available</h3>
+              <ul className="list-disc pl-5">
+                <li>Like and Dislike</li>
+                <li>To check if user is verified go to their profile</li>
+                <li>To be verified go to settings</li>
+                <li>Delete Post</li>
+                <li>Delete Account</li>
+                <li>Edit Account</li>
+                <li>Every Image is stored in Firebase</li>
+            </ul>
             </div>
           </div>
         </div>
