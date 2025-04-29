@@ -7,6 +7,7 @@ import RightSideBar from "@/components/RightSideBar";
 import ProfileCard from "@/components/ProfileCard";
 import axios from "axios";
 import PostPreview from "@/components/PostPreview";
+import { useAuthContext } from "@/hooks/useAuthContext";
 
 
 interface Post {
@@ -42,6 +43,7 @@ const ProfileContent = () => {
   const [userDetails, setUserDetails] = useState<UserDetails>();
   const [loading, setLoading] = useState<boolean>(true);
   const [posts, setPosts] = useState<Post[]>();
+  const {userInfo} = useAuthContext();
 
   // console.log(userId);
 
@@ -84,6 +86,7 @@ const ProfileContent = () => {
               username={userDetails.username}
               bio={userDetails.bio}
               pfp={userDetails.profile}
+              verified={userDetails.verified}
             />
           )}
           <div className="flex flex-col items-center gap-3 mt-10">
@@ -102,6 +105,7 @@ const ProfileContent = () => {
                     image={post.image}
                     likes={post.likes}
                     dislikes={post.dislikes}
+                    userVerified={userInfo.verified}
                   />
                 ))}
           </div>

@@ -1,15 +1,16 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from './ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
 import { Button } from './ui/button';
 import { usePostsContext } from '@/hooks/usePostsContext';
 import { useAuthContext } from '@/hooks/useAuthContext';
-import { ThumbsDown, ThumbsUp } from 'lucide-react';
+import { BadgeCheck, ThumbsDown, ThumbsUp } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image'
 import axios from 'axios';
+import { Label } from '@radix-ui/react-label';
 
 interface User {
   _id: string;
@@ -26,6 +27,7 @@ export interface PostInterface {
   image: string;
   likes: number;
   dislikes: number;
+  userVerified: boolean;
 }
 
 
@@ -39,13 +41,22 @@ const PostPreview: React.FC<PostInterface> = ({
   image, 
   likes, 
   dislikes,
+  userVerified
 }) => {
   const [likeCount, setLikeCount] = useState(likes);
   const [dislikeCount, setDislikeCount] = useState(dislikes);
+  const [showVerified, setShowVerified] = useState(false);
 
 
   const {userInfo} = useAuthContext() 
   const {dispatch} = usePostsContext()
+
+  useEffect (() => {
+    if (userVerified && (userInfo.username === user.username)){
+      setShowVerified(true)
+    }
+
+  }, [userInfo])
   
   const handleDelete = async () => {
 
@@ -123,6 +134,12 @@ const PostPreview: React.FC<PostInterface> = ({
           <Link href={`/profile?id=${user._id}`} className="hover:underline text-sm font-medium text-gray-500">
             {user.username}
           </Link>
+          {showVerified && 
+            <div className='flex items-center'>
+            <BadgeCheck size={18} color='#10B981'/> 
+            <Label className='text-green-500'>Verified</Label>
+            </div>}
+          
         </div>
       </CardHeader>
       <CardContent>

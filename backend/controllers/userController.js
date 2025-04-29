@@ -49,8 +49,9 @@ const login = async (req, res) =>{
     const token = createToken(user._id)
     const loggedUser = await User.findById(user.id)
     const userId = loggedUser._id
+    const verified = loggedUser.verified
 
-    res.status(200).json({userId, username, token})
+    res.status(200).json({userId, username, token, verified})
   }catch(error){
     res.status(400).json({error: error.message})
   }

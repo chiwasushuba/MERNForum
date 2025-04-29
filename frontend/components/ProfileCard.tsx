@@ -17,15 +17,18 @@ import {
 import DeleteAccountButton from "./DeleteAccountButton";
 import { useAuthContext } from "@/hooks/useAuthContext";
 import EditProfileButton from "./EditProfileButton";
+import { BadgeCheck } from "lucide-react";
+import { Label } from "@radix-ui/react-label";
 
 
 export interface ProfileInfo {
   username: string;
   pfp: string;
   bio: string;
+  verified: boolean;
 }
 
-export default function ProfileCard({username, pfp, bio }: ProfileInfo){
+export default function ProfileCard({username, pfp, bio, verified}: ProfileInfo){
 
   const {userInfo} = useAuthContext() 
   
@@ -43,10 +46,14 @@ export default function ProfileCard({username, pfp, bio }: ProfileInfo){
         </AvatarFallback>
         </Avatar>
         </div>
-        <div className="pt-10">
+        <div className="flex gap-2 pt-10">
 
-          <CardTitle></CardTitle>
           <p className="">{username}</p>
+          {verified && 
+            <div className='flex items-center'>
+            <BadgeCheck size={18} color='#10B981'/> 
+            <Label className='text-green-500'>Verified</Label>
+            </div>}
         </div>
         
 

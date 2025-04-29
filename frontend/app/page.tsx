@@ -47,9 +47,11 @@ export default function Home() {
 
     if(userInfo){
       fetchPosts();
+      console.log(userInfo.verified)
     }
   }, [dispatch, userInfo]);
 
+  
   
   return(
     <div className="flex justify-around">
@@ -69,6 +71,7 @@ export default function Home() {
                 image={post.image}
                 likes={post.likes}
                 dislikes={post.dislikes}
+                userVerified={userInfo.verified}
               />
             ))}
             <div className="fixed bottom-5 right-75">
