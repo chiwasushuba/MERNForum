@@ -5,7 +5,8 @@ const express = require("express");
 
 const userRoutes = require('./routes/userRoute');
 const postRoutes = require('./routes/postRoute');
-const otpRoutes = require("./routes/otpRoute")
+const otpRoutes = require("./routes/otpRoute");
+const searchRoutes = require("./routes/searchRoute")
 
 // Automatic Folder Creator
 const fs = require('fs');
@@ -41,6 +42,7 @@ app.use((req, res, next) => {
 app.use("/api/user",userRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/otp", otpRoutes)
+app.use("/api/search", searchRoutes)
 
 
 
@@ -55,3 +57,5 @@ mongoose.connect(process.env.MONGO_URI)
   .catch((error) => {
     console.log(error)
   })
+
+
