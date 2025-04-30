@@ -19,6 +19,7 @@ interface Post {
     _id: string
     profile: string;
     username: string;
+    verified: boolean;
   };
   likes: number;
   dislikes: number;
@@ -62,7 +63,7 @@ const ProfileContent = () => {
           setUserDetails(userResp.data);
           setPosts(postResp.data);
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.error("Error fetching user:", error);
       } finally {
         setLoading(false);
@@ -105,7 +106,6 @@ const ProfileContent = () => {
                     image={post.image}
                     likes={post.likes}
                     dislikes={post.dislikes}
-                    userVerified={userInfo?.verified ?? false}
                   />
                 ))}
           </div>

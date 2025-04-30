@@ -6,7 +6,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
 import { Button } from './ui/button';
 import { usePostsContext } from '@/hooks/usePostsContext';
 import { useAuthContext } from '@/hooks/useAuthContext';
-import { BadgeCheck, ThumbsDown, ThumbsUp } from 'lucide-react';
+import { BadgeCheck, ThumbsDown, ThumbsUp, Verified } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image'
 import axios from 'axios';
@@ -16,6 +16,7 @@ interface User {
   _id: string;
   username: string;
   profile: string;
+  verified: boolean;
 }
 
 export interface PostInterface {
@@ -27,7 +28,6 @@ export interface PostInterface {
   image: string;
   likes: number;
   dislikes: number;
-  userVerified: boolean;
 }
 
 
@@ -41,22 +41,21 @@ const PostPreview: React.FC<PostInterface> = ({
   image, 
   likes, 
   dislikes,
-  userVerified
 }) => {
   const [likeCount, setLikeCount] = useState(likes);
   const [dislikeCount, setDislikeCount] = useState(dislikes);
-  const [showVerified, setShowVerified] = useState(false);
+  // const [showVerified, setShowVerified] = useState(false);
 
 
   const {userInfo} = useAuthContext() 
   const {dispatch} = usePostsContext()
 
-  useEffect (() => {
-    if (userVerified && (userInfo.username === user.username)){
-      setShowVerified(true)
-    }
-
-  }, [userInfo])
+  // useEffect(() => {
+  //   if (userVerified && userInfo && userInfo.username === user.username) {
+  //     setShowVerified(true);
+  //   }
+  // }, [userVerified, userInfo, user.username]);
+  
   
   const handleDelete = async () => {
 
@@ -127,14 +126,14 @@ const PostPreview: React.FC<PostInterface> = ({
         <div className="flex items-center gap-2">
           <Link href={`/profile?id=${user._id}`}>
             <Avatar>
-              <AvatarImage className="size-8 rounded-full" src={profile} />
+              <AvatarImage className="size-8 rounded-full border border-black" src={profile} />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
           </Link>
           <Link href={`/profile?id=${user._id}`} className="hover:underline text-sm font-medium text-gray-500">
             {user.username}
           </Link>
-          {showVerified && 
+          {user.verified && 
             <div className='flex items-center'>
             <BadgeCheck size={18} color='#10B981'/> 
             <Label className='text-green-500'>Verified</Label>

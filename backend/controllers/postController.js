@@ -3,7 +3,7 @@ const Post = require("../models/postModel")
 const { bucket } = require("../utils/firebase");
 
 const getPosts = async (req, res) => {
-  const posts = await Post.find().populate("user", "username profile").sort({ createdAt: -1 }); // Populate usernames for all posts
+  const posts = await Post.find().populate("user", "username profile verified").sort({ createdAt: -1 }); // Populate usernames for all posts
   try{
     res.status(200).json(posts)
   }catch(error){
@@ -17,7 +17,7 @@ const getPost = async (req, res) => {
 
   const { id } = req.params
   
-  const post = await Post.findById(id).populate("user", "username profile");  // Populate usernames for that specific post you will need this later in getting the posts in profile
+  const post = await Post.findById(id).populate("user", "username profile verified");  // Populate usernames for that specific post you will need this later in getting the posts in profile
 
   if(!post){
     return res.status(404).json({error: "post not found"})
