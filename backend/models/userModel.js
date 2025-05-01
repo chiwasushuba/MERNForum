@@ -40,6 +40,19 @@ const userSchema = new Schema({
     type: Number,
     default: 0
   },
+
+
+  // being followed
+  followedBy:[{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  }],
+
+  // following
+  followingUsers:[{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  }],
   
   verified:{
     type: Boolean,

@@ -8,9 +8,10 @@ const {
   login,
   signup,
   getUserPosts,
+  followUser
 } = require("../controllers/userController")
 const upload = require('../utils/requireUpload');
-
+const requireAuth = require("../middleware/requireAuth")
 
 const router = express.Router()
 
@@ -35,7 +36,8 @@ router.post('/signup', signup)
 // get all users posts
 router.get(`/post/:id`, getUserPosts)
 
-
+// follow a user 
+router.get('/follow/:id', requireAuth ,followUser)
 
 
 module.exports = router;

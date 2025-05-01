@@ -172,6 +172,73 @@ const getUserPosts = async (req ,res) => {
   res.status(200).json(posts)
 }
 
+const followUser = async (req, res) => {
+  try {
+    const { id } = req.params; // ID of the user being followed
+    const userId = req.user._id; // ID of the logged-in user
+
+    // Find the users
+    const followingUser = await User.findById(id); // User to be followed
+    const loggedUser = await User.findById(userId); // Logged-in user
+
+    // Ensure both users exist
+    if (!followingUser) {
+      return res.status(404).json({ message: "User to follow not found" });
+    }
+    if (!loggedUser) {
+      return res.status(404).json({ message: "Logged-in user not found" });
+    }
+
+    // Check if already following
+    const alreadyFollowing = loggedUser.followingUsers.includes(id);
+
+
+    /* 
+      Following = Number / Integer 
+      Followers = Number / Integer 
+      FollowedBy = nagfofollow saken 
+      FollowingUsers = finofollow ko 
+    */
+
+    if (alreadyFollowing) {
+      // Remove following relationship
+      loggedUser.followingUsers = loggedUser.followingUsers.filter(
+        (followingId) => followingId.toString() !== id.toString()
+      );
+      loggedUser.following--; // Reduce following count
+
+      followingUser.followedBy = followingUser.followedBy.filter(
+        (followerId) => followerId.toString() !== userId.toString()
+      );
+      followingUser.followers--; // Reduce followers count
+    } else {
+      // Add following relationship
+      loggedUser.followingUsers.push(id);
+      loggedUser.following++; // Increase following count
+
+      followingUser.followedBy.push(userId);
+      followingUser.followers++; // Increase followers count
+    }
+
+    // Save both users
+    await loggedUser.save();
+    await followingUser.save();
+
+    // Respond with success message
+    return res.status(200).json({
+      message: alreadyFollowing
+        ? "Unfollowed user successfully"
+        : "Followed user successfully",
+      followingUsers: loggedUser.followingUsers,
+      followers: followingUser.followedBy,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "An error occurred while updating follow status" });
+  }
+};
+
+
 module.exports = {
   getUsers,
   getUser,
@@ -180,5 +247,5 @@ module.exports = {
   updateUser,
   login,
   getUserPosts,
-
+  followUser,
 }
