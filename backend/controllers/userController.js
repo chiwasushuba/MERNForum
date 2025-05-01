@@ -238,6 +238,33 @@ const followUser = async (req, res) => {
   }
 };
 
+const getUserWithFollowStatus = async (req, res) => {
+  const { id } = req.params;
+  const loggedInUserId = req.user._id;
+
+  try {
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const isFollowing = user.followedBy.includes(loggedInUserId.toString());
+
+    res.status(200).json({
+      _id: user._id,
+      username: user.username,
+      profile: user.profile,
+      followers: user.followers,
+      following: user.following,
+      isFollowing,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to fetch user with follow status" });
+  }
+}
+
 
 module.exports = {
   getUsers,
@@ -248,4 +275,5 @@ module.exports = {
   login,
   getUserPosts,
   followUser,
+  getUserWithFollowStatus,
 }

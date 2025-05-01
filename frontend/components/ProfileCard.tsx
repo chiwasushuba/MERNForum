@@ -19,16 +19,18 @@ import { useAuthContext } from "@/hooks/useAuthContext";
 import EditProfileButton from "./EditProfileButton";
 import { BadgeCheck } from "lucide-react";
 import { Label } from "@radix-ui/react-label";
+import FollowButton from "./FollowButton";
 
 
 export interface ProfileInfo {
+  _id: string;
   username: string;
   pfp: string;
   bio: string;
   verified: boolean;
 }
 
-export default function ProfileCard({username, pfp, bio, verified}: ProfileInfo){
+export default function ProfileCard({_id, username, pfp, bio, verified}: ProfileInfo){
 
   const {userInfo} = useAuthContext() 
 
@@ -70,13 +72,14 @@ export default function ProfileCard({username, pfp, bio, verified}: ProfileInfo)
         </form>
       </CardContent>
       <CardFooter className="flex justify-end">
-        {(userInfo.username === username) && (
-          <>
-            <EditProfileButton />
-            <DeleteAccountButton /> 
-            {/* <Button>Delete</Button> */}
-          </>
-        )}
+      {userInfo.username === username ? (
+        <>
+          <EditProfileButton />
+          <DeleteAccountButton /> 
+        </>
+      ) : (
+        <FollowButton followingUserId={_id} />
+      )}
         
       </CardFooter>
     </Card>

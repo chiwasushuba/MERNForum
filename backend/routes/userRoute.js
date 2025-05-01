@@ -8,7 +8,8 @@ const {
   login,
   signup,
   getUserPosts,
-  followUser
+  followUser,
+  getUserWithFollowStatus
 } = require("../controllers/userController")
 const upload = require('../utils/requireUpload');
 const requireAuth = require("../middleware/requireAuth")
@@ -37,7 +38,9 @@ router.post('/signup', signup)
 router.get(`/post/:id`, getUserPosts)
 
 // follow a user 
-router.get('/follow/:id', requireAuth ,followUser)
+router.patch('/follow/:id', requireAuth ,followUser)
+
+router.get('/follow/status/:id', requireAuth, getUserWithFollowStatus);
 
 
 module.exports = router;

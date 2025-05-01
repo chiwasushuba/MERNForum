@@ -87,6 +87,7 @@ const ProfileContent = () => {
         <div className="w-200">
           {userDetails && (
             <ProfileCard
+              _id={userDetails._id}
               username={userDetails.username}
               bio={userDetails.bio}
               pfp={userDetails.profile}

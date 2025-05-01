@@ -7,6 +7,8 @@ import { Label } from '@radix-ui/react-label'
 import { BadgeCheck } from 'lucide-react'
 import { Button } from './ui/button'
 import Link from 'next/link'
+import FollowButton from './FollowButton'
+import { useAuthContext } from '@/hooks/useAuthContext';
 
 interface UserProps{
   _id: string
@@ -19,7 +21,7 @@ interface UserProps{
 }
 
 const UserPreview = ({_id ,profile, username, bio, followers, following, verified}: UserProps) => {
-
+  const { userInfo } = useAuthContext();
 
   return (
     <Card className='w-[600px] h-auto'> 
@@ -47,11 +49,14 @@ const UserPreview = ({_id ,profile, username, bio, followers, following, verifie
         </div>
       </CardContent>
       <CardFooter className='flex justify-between'>
+      {userInfo.username !== username ? (
+        <FollowButton followingUserId={_id} />
+      ) : (
         <div className='flex gap-4 text-sm text-gray-600'>
-          <span>Following: {following} </span>
+          <span>Following: {following}</span>
           <span>Followers: {followers}</span>
         </div>
-        <Button>Follow</Button>
+      )}
       </CardFooter>
     </Card>
   )
