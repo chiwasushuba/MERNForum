@@ -49,6 +49,7 @@ export default function Home() {
 
         if (response.ok) {
           dispatch({ type: "SET_POSTS", payload: json });
+          document.title = `Flux Talk`;
         } else {
           console.error("Failed to fetch posts", json);
         }

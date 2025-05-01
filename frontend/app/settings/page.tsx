@@ -25,6 +25,7 @@ const Settings = () => {
     if(localUser){
       const parsedUser = JSON.parse(localUser)
       setUsername(parsedUser.username)
+      document.title = `Settings | Flux Talk`;
     }
   }, [])
 

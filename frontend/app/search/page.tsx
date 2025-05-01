@@ -49,7 +49,10 @@ const SearchContent = () => {
   const cleanedQuery = query.startsWith('@') || query.startsWith('#') ? query.slice(1) : query
 
   useEffect(() => {
-    if (!query) return
+    if (!query){
+      document.title = `Search: ${cleanedQuery} | Flux Talk`;
+      return
+    }  
 
     const fetchData = async () => {
       setIsLoading(true)
@@ -58,14 +61,17 @@ const SearchContent = () => {
           const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/search/users?query=${encodeURIComponent(cleanedQuery)}`)
           setResultsUsers(res.data.results)
           setActiveTab('users')
+          document.title = `Search: ${cleanedQuery} | Flux Talk`;
         } else if (query.startsWith('#')) {
           const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/search/posts?query=${encodeURIComponent(cleanedQuery)}`)
           setResultsPosts(res.data.results)
           setActiveTab('posts')
+          document.title = `Search: ${cleanedQuery} | Flux Talk`;
         } else {
           const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/search?query=${encodeURIComponent(cleanedQuery)}`)
           setResultsUsers(res.data.resultsUsers)
           setResultsPosts(res.data.resultsPosts)
+          document.title = `Search: ${cleanedQuery} | Flux Talk`;
         }
       } catch (err) {
         console.error(err)

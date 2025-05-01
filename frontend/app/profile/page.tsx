@@ -51,6 +51,8 @@ const ProfileContent = () => {
   useEffect(() => {
     if (!userId) {
       setLoading(false);
+      document.title = "User Profile | Flux Talk"; // Default title if no user ID
+      return;
     }
 
     const fetchEverything = async () => {
@@ -62,6 +64,7 @@ const ProfileContent = () => {
         if (userResp.status === 200 && postResp.status === 200) {
           setUserDetails(userResp.data);
           setPosts(postResp.data);
+          document.title = `${userResp.data.username}'s Profile | Flux Talk`;
         }
       } catch (error: unknown) {
         console.error("Error fetching user:", error);

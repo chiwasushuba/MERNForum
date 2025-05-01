@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@radix-ui/react-label';
 import { motion } from 'framer-motion'
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {useSignup} from '@/hooks/useSignup'
 import {useRouter} from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
@@ -17,6 +17,10 @@ const Signup = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const {signup, error} = useSignup()
   const router = useRouter()
+
+  useEffect(() => {
+    document.title = "Sign Up | Flux Talk"; // Set the title when the component mounts
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

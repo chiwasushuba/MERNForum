@@ -6,7 +6,7 @@ import { Label } from '@radix-ui/react-label';
 import { Eye, EyeOff } from 'lucide-react'
 import { motion } from 'framer-motion'
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {useLogin} from '@/hooks/useLogin'
 import {useRouter} from 'next/navigation';
 
@@ -18,6 +18,9 @@ const Login = () => {
   const {login, error} = useLogin()
   const router = useRouter()
  
+  useEffect(() => {
+    document.title = "Login | Flux Talk"; 
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
