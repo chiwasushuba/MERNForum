@@ -49,14 +49,15 @@ const UserPreview = ({_id ,profile, username, bio, followers, following, verifie
         </div>
       </CardContent>
       <CardFooter className='flex justify-between'>
-      {userInfo.username !== username ? (
+      <div className='flex gap-4 text-sm text-gray-600'>
+        <span>Followers: {followers}</span>
+        <span>Following: {following}</span>
+      </div>
+      {(userInfo.username !== username) && (
         <FollowButton followingUserId={_id} />
-      ) : (
-        <div className='flex gap-4 text-sm text-gray-600'>
-          <span>Following: {following}</span>
-          <span>Followers: {followers}</span>
-        </div>
       )}
+      
+      
       </CardFooter>
     </Card>
   )

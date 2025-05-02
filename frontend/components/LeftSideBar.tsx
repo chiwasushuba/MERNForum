@@ -27,7 +27,7 @@ const LeftSideBar = () => {
   }
 
   return (
-    <div className="fixed top-0 left-0 h-screen w-64 overflow-y-auto bg-gray-100 border-r border-gray-200">
+    <div className="fixed top-0 left-0 h-screen w-64 overflow-y-auto bg-gray-200 border-r border-gray-300">
         <div className="flex flex-col p-4 gap-4 h-full">
           <div className="font-bold text-xl">
             Dashboard

@@ -87,11 +87,13 @@ export default function EditProfileButton({ setIsOpen } : AddPostDivProps) {
                 
             });
         
-            if (res.status === 200) 
+            if (res.status === 200){ 
                 alert("Successfully updated profile");
-            else 
+                // logout()
+            } else{ 
                 alert(res.status)
-            
+            }
+
         } catch (error: unknown) {
             const axiosError = error as AxiosError<ErrorResponse>;
             if (axiosError.response && axiosError.response.status === 409) {
