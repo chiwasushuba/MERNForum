@@ -25,6 +25,11 @@ interface Post {
   dislikes: number;
 }
 
+interface Follow {
+  _id: string;
+  username: string
+}
+
 interface UserDetails {
   _id: string;
   email: string,
@@ -34,6 +39,8 @@ interface UserDetails {
   bio: string,
   followers: number,
   following: number,
+  followedBy: Follow[];
+  followingUsers: Follow[];
   verified: boolean,
 }
 
@@ -79,7 +86,8 @@ const ProfileContent = () => {
   }, [userId]);
 
   if (loading) return <p>Loading...</p>;
-
+  
+  
   return (
     <div className="flex justify-around">
       <LeftSideBar />
@@ -91,8 +99,11 @@ const ProfileContent = () => {
               username={userDetails.username}
               bio={userDetails.bio}
               pfp={userDetails.profile}
-              verified={userDetails.verified}
-            />
+              following={userDetails.following}
+              followers={userDetails.followers}
+              followedBy={userDetails.followedBy} 
+              followingUsers={userDetails.followingUsers}
+              verified={userDetails.verified} />
           )}
           <div className="flex flex-col items-center gap-3 mt-10">
             {posts &&
