@@ -6,7 +6,6 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card"
 
 import {
@@ -20,26 +19,40 @@ import EditProfileButton from "./EditProfileButton";
 import { BadgeCheck } from "lucide-react";
 import { Label } from "@radix-ui/react-label";
 import FollowButton from "./FollowButton";
+import { useState } from "react";
+import FollowersDiv from "./FollowersDiv";
+import FollowingDiv from "./FollowingDiv";
 
-
+interface Follow {
+  _id: string;
+  username: string
+}
 export interface ProfileInfo {
   _id: string;
   username: string;
   pfp: string;
   bio: string;
+  following: number;
+  followers: number;
+  followedBy: Follow[];
+  followingUsers: Follow[];
   verified: boolean;
 }
 
-export default function ProfileCard({_id, username, pfp, bio, verified}: ProfileInfo){
+export default function ProfileCard({_id, username, pfp, bio, following, followers, followedBy, followingUsers, verified}: ProfileInfo){
 
+  const [isOpenFollowers, setIsOpenFollowers] = useState(false)
+  const [isOpenFollowing, setIsOpenFollowings] = useState(false)
   const {userInfo} = useAuthContext() 
 
   if (!userInfo) {
     return <div>User not logged in</div>;
   }
+
+  // console.log(followingUsers)
   
   return (
-    <Card className="w-full">
+    <Card className="w-full z-30">
       <CardHeader>
         <div className="relative w-full h-32 bg-gray-400">
         
@@ -71,16 +84,33 @@ export default function ProfileCard({_id, username, pfp, bio, verified}: Profile
           </div>
         </form>
       </CardContent>
-      <CardFooter className="flex justify-end">
+      <CardFooter className="flex justify-between">
+      <div className="flex gap-3">
+        <span 
+          onClick={() => setIsOpenFollowers(true)}
+          className="cursor-pointer hover:underline "
+          >Followers {followers}
+        </span>
+
+        <span 
+          onClick={() => (setIsOpenFollowings(true))}
+          className="cursor-pointer hover:underline"
+        >
+          Following {following}
+        </span>
+      </div>
+
+      {isOpenFollowers && <FollowersDiv setIsOpen={setIsOpenFollowers} followedBy={followedBy} />}
+      {isOpenFollowing && <FollowingDiv setIsOpen={setIsOpenFollowings} followingUsers={followingUsers} />}
+
       {userInfo.username === username ? (
-        <>
+        <div className="flex">
           <EditProfileButton />
           <DeleteAccountButton /> 
-        </>
+        </div>
       ) : (
         <FollowButton followingUserId={_id} />
       )}
-        
       </CardFooter>
     </Card>
   )
