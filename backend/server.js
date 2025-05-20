@@ -2,6 +2,8 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 const cors = require("cors");
 const express = require("express");
+const http = require('http');             
+const { Server } = require('socket.io');
 
 const userRoutes = require('./routes/userRoute');
 const postRoutes = require('./routes/postRoute');
@@ -21,6 +23,34 @@ if (!fs.existsSync(uploadDir)) {
 
 // creates APP in express to access the whole backend application
 const app = express();
+
+// creates server for socket.io so that it can be merged with express app
+const server = http.createServer(app);
+
+
+// BELOW IS THE SOCKET.IO IMPLEMENTATION
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:3000', // Change as needed for frontend URL
+    methods: ['GET', 'POST']
+  }
+});
+
+io.on('connection', (socket) => {
+  console.log('Socket connected:', socket.id);
+
+  socket.on('send_message', (data) => {
+    console.log('Message from client:', data);
+    io.emit('receive_message', data); // Broadcast
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Socket disconnected:', socket.id);
+  });
+});
+
+// ABOVE IS THE SOCKET.IO IMPLEMENTATION
+
 
 // Middleware
 app.use(cors());
@@ -49,7 +79,7 @@ app.use("/api/search", searchRoutes)
 // Connect DB and Server Start
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
-    app.listen(process.env.PORT, () => {
+    server.listen(process.env.PORT, () => {
       console.log("listening to port " + process.env.PORT);
       console.log("connected to db")
     })

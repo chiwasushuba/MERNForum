@@ -105,7 +105,7 @@ export default function EditProfileButton({ setIsOpen } : AddPostDivProps) {
     const removeImage = () => {
         setNewImage(null)
         setImagePreview('')
-      }
+    }
     
     return (
 

@@ -16,6 +16,7 @@ import { X, ImageIcon } from 'lucide-react'
 import { useCreatePost } from "../hooks/useCreatePost"
 import { Textarea } from './ui/textarea'
 import { motion } from 'framer-motion'
+const imageCompression = require('browser-image-compression');
 
 interface AddPostDivProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -25,6 +26,7 @@ const AddPostDiv = ({ setIsOpen } : AddPostDivProps) => {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [image, setImage] = useState<File | null>(null); // Changed to null for consistency
+  const [compressedImage, setCompressedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState('') // Added for image preview
   const { createPost, isLoading } = useCreatePost()
   const [openImageBtn, setIsOpenImageBtn] = useState(false)
@@ -41,18 +43,25 @@ const AddPostDiv = ({ setIsOpen } : AddPostDivProps) => {
 
   
   // Fixed handleImageChange function
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-
-    const file = e.target.files?.[0]; // Fixed: files not file
-  
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
-      setImage(file) // Store the actual file object
-      
-      // Create a preview URL for the image
-      const previewUrl = URL.createObjectURL(file)
-      setImagePreview(previewUrl)
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 800,
+        useWebWorker: true,
+      };
+  
+      try {
+        const compressedFile = await imageCompression(file, options);
+        setCompressedImage(compressedFile); // save compressed image to state
+        const previewUrl = URL.createObjectURL(compressedFile);
+        setImagePreview(previewUrl);
+      } catch (error) {
+        console.error("Image compression failed:", error);
+      }
     }
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); // Added to prevent default form submission
@@ -64,7 +73,7 @@ const AddPostDiv = ({ setIsOpen } : AddPostDivProps) => {
 
     try {
       // Pass the actual file object to createPost
-      const response = await createPost(title, content, image)
+      const response = await createPost(title, content, compressedImage)
 
       console.log(response?.status)
 
