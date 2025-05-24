@@ -5,10 +5,13 @@ const express = require("express");
 const http = require('http');             
 const { Server } = require('socket.io');
 
+
+// basta yung routes
 const userRoutes = require('./routes/userRoute');
 const postRoutes = require('./routes/postRoute');
 const otpRoutes = require("./routes/otpRoute");
 const searchRoutes = require("./routes/searchRoute")
+const messageRoutes = require('./routes/messageRoute');
 
 // Automatic Folder Creator
 const fs = require('fs');
@@ -73,6 +76,8 @@ app.use("/api/user",userRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/otp", otpRoutes)
 app.use("/api/search", searchRoutes)
+app.use("/api/messages", messageRoutes)
+
 
 
 

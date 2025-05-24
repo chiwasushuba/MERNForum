@@ -1,24 +1,39 @@
-const mongoose = require("mongoose")
-
-const Schema = mongoose.Schema
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
 const messageSchema = new Schema({
-  text: {
+  content: {
     type: String,
-    required: true
+    required: true,
   },
   senderId: {
-    type: String,
-    required: true
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
   },
   receiverId: {
-    type: String // Optional, if you want private chat
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+  },
+  isRead: {
+    type: Boolean,
+    default: false,
+  },
+  isDelivered: {
+    type: Boolean,
+    default: false,
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false,
   },
   timestamp: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
+});
 
-})
+// Optional: Add index for fast inbox/history queries
+messageSchema.index({ senderId: 1, receiverId: 1, timestamp: 1 });
 
 module.exports = mongoose.model('Message', messageSchema);
