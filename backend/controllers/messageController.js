@@ -1,19 +1,35 @@
 const Message = require('../models/messageModel');
+const Conversation = require('../models/conversationModel');
 
 // Send a message
 const sendMessage = async (req, res) => {
   try {
-    const { content, senderId, receiverId } = req.body;
+    const { senderId, receiverId, content } = req.body;
 
+    // Create and save the message
     const newMessage = await Message.create({
       content,
       senderId,
       receiverId,
     });
 
+    // Create or update the conversation
+    await Conversation.findOneAndUpdate(
+      {
+        members: { $all: [senderId, receiverId] }
+      },
+      {
+        members: [senderId, receiverId],
+        lastMessage: content,
+        lastMessageAt: Date.now()
+      },
+      { upsert: true, new: true }
+    );
+
     res.status(201).json(newMessage);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Error sending message:', err);
+    res.status(500).json({ message: 'Error sending message', error: err.message });
   }
 };
 
@@ -95,5 +111,5 @@ module.exports = {
   softDeleteMessage,
   updateMessage,
   deleteMessage,
-  
+
 }

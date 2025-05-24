@@ -42,15 +42,26 @@ const io = new Server(server, {
 io.on('connection', (socket) => {
   console.log('Socket connected:', socket.id);
 
+  // User joins their own room (use this in frontend after login)
+  socket.on('join', (userId) => {
+    socket.join(userId);
+    console.log(`User ${userId} joined their personal room`);
+  });
+
+  // Send message to specific user room
   socket.on('send_message', (data) => {
-    console.log('Message from client:', data);
-    io.emit('receive_message', data); // Broadcast
+    const { receiverId, senderId, content } = data;
+    console.log(`Sending message from ${senderId} to ${receiverId}`);
+    
+    // Send to receiver only
+    io.to(receiverId).emit('receive_message', data);
   });
 
   socket.on('disconnect', () => {
     console.log('Socket disconnected:', socket.id);
   });
 });
+
 
 // ABOVE IS THE SOCKET.IO IMPLEMENTATION
 
