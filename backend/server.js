@@ -42,7 +42,7 @@ const io = new Server(server, {
 io.on('connection', (socket) => {
   console.log('Socket connected:', socket.id);
 
-  // User joins their own room (use this in frontend after login)
+  // User joins their own room (shows this in frontend after login [because connected])
   socket.on('join', (userId) => {
     socket.join(userId);
     console.log(`User ${userId} joined their personal room`);
