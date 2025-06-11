@@ -51,7 +51,6 @@ const ProfileContent = () => {
   const [userDetails, setUserDetails] = useState<UserDetails>();
   const [loading, setLoading] = useState<boolean>(true);
   const [posts, setPosts] = useState<Post[]>();
-  const {userInfo} = useAuthContext();
 
   // console.log(userId);
 
