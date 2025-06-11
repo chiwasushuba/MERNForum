@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import { useAuthContext } from '@/hooks/useAuthContext';
+import axios from 'axios';
 
 type OnlineUser = {
   userId: string;
@@ -10,8 +11,11 @@ type OnlineUser = {
 };
 
 type Message = {
+  _id?: string;
   senderId: string;
+  receiverId?: string;
   content: string;
+  timestamp?: string;
 };
 
 export default function ChatPage() {
@@ -33,32 +37,55 @@ export default function ChatPage() {
     });
 
     socketInstance.on('online_users', (users: OnlineUser[]) => {
-      // Filter out self
       const others = users.filter((u) => u.userId !== userInfo._id);
       setOnlineUsers(others);
     });
 
     socketInstance.on('receive_message', (data: Message) => {
-      setMessages((prev) => [...prev, data]);
+      if (
+        selectedUser &&
+        (data.senderId === selectedUser.userId || data.receiverId === selectedUser.userId)
+      ) {
+        setMessages((prev) => [...prev, data]);
+      }
     });
 
     return () => {
       socketInstance.disconnect();
     };
-  }, [authIsReady, userInfo]);
+  }, [authIsReady, userInfo, selectedUser]);
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!newMessage.trim() || !selectedUser || !socket) return;
 
-    const messageData = {
+    const messageData: Message = {
       senderId: userInfo._id,
       receiverId: selectedUser.userId,
       content: newMessage,
     };
 
     socket.emit('send_message', messageData);
-    setMessages((prev) => [...prev, { senderId: userInfo._id, content: newMessage }]);
+
+    // Optionally store it in DB
+    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/messages/send`, messageData);
+
+    setMessages((prev) => [...prev, { ...messageData }]);
     setNewMessage('');
+  };
+
+  const handleSelectUser = async (user: OnlineUser) => {
+    if (user.userId === userInfo._id) return;
+    setSelectedUser(user);
+    setMessages([]);
+
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/messages/history/${userInfo._id}/${user.userId}`
+      );
+      setMessages(res.data);
+    } catch (err) {
+      console.error('Error fetching message history:', err);
+    }
   };
 
   if (!authIsReady) return <p>Loading...</p>;
@@ -75,10 +102,7 @@ export default function ChatPage() {
               className={`cursor-pointer hover:underline ${
                 selectedUser?.userId === u.userId ? 'font-bold text-blue-500' : ''
               }`}
-              onClick={() => {
-                setSelectedUser(u);
-                setMessages([]); // reset messages on new selection
-              }}
+              onClick={() => handleSelectUser(u)}
             >
               {u.username}
             </li>
