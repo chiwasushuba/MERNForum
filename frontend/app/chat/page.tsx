@@ -1,74 +1,50 @@
-// pages/chat.js
+'use client';
+
 import { useEffect, useState } from 'react';
-import socket from '../lib/socket';
+import { io, Socket } from 'socket.io-client';
 
-export default function Chat() {
-  const [input, setInput] = useState('');
-  const [messages, setMessages] = useState([]);
+type OnlineUser = {
+  userId: string;
+  username: string;
+};
 
-  // Load chat history on mount
+export default function OnlineUsersPage() {
+  const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
+  const [userInfo, setUserInfo] = useState<OnlineUser | null>(null);
+
   useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/api/chat`);
-        const data = await res.json();
-        setMessages(data);
-      } catch (err) {
-        console.error('Error fetching chat history:', err);
-      }
-    };
-
-    fetchMessages();
+    const storedUser = localStorage.getItem('userInfo');
+    if (storedUser) {
+      setUserInfo(JSON.parse(storedUser));
+    }
   }, []);
 
-  // Setup socket listener
   useEffect(() => {
-    socket.on('receive_message', (message) => {
-      setMessages((prev) => [...prev, message]);
+    if (!userInfo) return;
+
+    const socketInstance = io('http://localhost:4000');
+
+    socketInstance.on('connect', () => {
+      socketInstance.emit('join', userInfo);
     });
 
-    return () => socket.off('receive_message');
-  }, []);
+    socketInstance.on('online_users', (users: OnlineUser[]) => {
+      setOnlineUsers(users);
+    });
 
-  const sendMessage = () => {
-    if (!input.trim()) return;
-
-    const msg = {
-      text: input,
-      senderId: 'frontendUser123', // Replace this with real user ID if needed
+    return () => {
+      socketInstance.disconnect();
     };
-
-    socket.emit('send_message', msg);
-    setInput('');
-  };
+  }, [userInfo]);
 
   return (
     <div style={{ padding: '2rem' }}>
-      <h1>Live Chat</h1>
-
-      <div style={{
-        border: '1px solid #ccc',
-        borderRadius: '8px',
-        padding: '1rem',
-        maxHeight: '300px',
-        overflowY: 'auto',
-        marginBottom: '1rem'
-      }}>
-        {messages.map((m, i) => (
-          <div key={i} style={{ marginBottom: '0.5rem' }}>
-            <strong>{m.senderId || 'Unknown'}:</strong> {m.text}
-          </div>
+      <h2>🟢 Online Users</h2>
+      <ul>
+        {onlineUsers.map((user) => (
+          <li key={user.userId}>{user.username}</li>
         ))}
-      </div>
-
-      <input
-        type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder="Type your message"
-        style={{ padding: '0.5rem', width: '300px', marginRight: '1rem' }}
-      />
-      <button onClick={sendMessage}>Send</button>
+      </ul>
     </div>
   );
 }

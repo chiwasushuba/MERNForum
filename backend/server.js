@@ -39,28 +39,36 @@ const io = new Server(server, {
   }
 });
 
+const onlineUsers = new Map(); // socket.id -> { userId, username }
+
 io.on('connection', (socket) => {
   console.log('Socket connected:', socket.id);
 
-  // User joins their own room (shows this in frontend after login [because connected])
-  socket.on('join', (userId) => {
+  socket.on('join', ({ userId, username }) => {
     socket.join(userId);
-    console.log(`User ${userId} joined their personal room`);
-  });
+    socket.data.userId = userId;
+    socket.data.username = username;
 
-  // Send message to specific user room
-  socket.on('send_message', (data) => {
-    const { receiverId, senderId, content } = data;
-    console.log(`Sending message from ${senderId} to ${receiverId}`);
-    
-    // Send to receiver only
-    io.to(receiverId).emit('receive_message', data);
+    onlineUsers.set(socket.id, { userId, username });
+    console.log(`User ${username} (${userId}) joined`);
+
+    // Send updated list to everyone
+    io.emit('online_users', Array.from(onlineUsers.values()));
   });
 
   socket.on('disconnect', () => {
-    console.log('Socket disconnected:', socket.id);
+    const userId = socket.data.userId;
+    const username = socket.data.username;
+
+    console.log(`User ${username || 'unknown'} disconnected`);
+
+    if (onlineUsers.has(socket.id)) {
+      onlineUsers.delete(socket.id);
+      io.emit('online_users', Array.from(onlineUsers.values()));
+    }
   });
 });
+
 
 
 // ABOVE IS THE SOCKET.IO IMPLEMENTATION
