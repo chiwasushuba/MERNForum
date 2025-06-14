@@ -14,14 +14,17 @@ const upload = require('../utils/requireUpload');
 
 const router = express.Router()
 
-// authorization to see posts
-router.use(requireAuth)
+
+
 
 // get all posts
 router.get('/', getPosts)
 
 // get a single post
 router.get('/:id', getPost)
+
+// authorization to change posts
+router.use(requireAuth)
 
 // create a post
 router.post('/', upload.single("image"), createPost);

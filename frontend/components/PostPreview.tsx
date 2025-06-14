@@ -85,7 +85,10 @@ const PostPreview: React.FC<PostInterface> = ({
   };
 
   const handleLike = async () => {
-    if (!user) return;
+    if (!userInfo) {
+      alert("Login to Like / Dislike a post");
+      return;
+    };
     try {
       const res = await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/post/${postId}/like`,
@@ -100,7 +103,10 @@ const PostPreview: React.FC<PostInterface> = ({
   };
   
   const handleDislike = async () => {
-    if (!user) return;
+    if (!userInfo) {
+      alert("Login to Like / Dislike a post");
+      return
+    };
     try {
       const res = await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/post/${postId}/dislike`,

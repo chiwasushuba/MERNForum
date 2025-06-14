@@ -7,8 +7,7 @@ import { useEffect, useState } from "react";
 import { useAuthContext } from "@/hooks/useAuthContext";  
 import AddPostButton from "@/components/AddPostButton";
 import PostPreview from "@/components/PostPreview";
-import { Label } from "@radix-ui/react-label";
-import UserPreview from "@/components/UserPreview";
+
 
 interface Post {
   _id: string;
@@ -37,14 +36,16 @@ export default function Home() {
     const fetchPosts = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/post/`,
-          {
-            headers: {
-              "Authorization": `Bearer ${userInfo.token}`
-            }
-          }
-        );
+        const headers: HeadersInit = {};
+
+        if (userInfo?.token) {
+          headers["Authorization"] = `Bearer ${userInfo.token}`;
+        }
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/post/`, {
+          headers,
+        });
+
         const json = await response.json();
 
         if (response.ok) {
@@ -60,10 +61,10 @@ export default function Home() {
       }
     };
 
-    if (userInfo) {
-      fetchPosts();
-    }
+    // Always call fetchPosts — allow guests to see posts
+    fetchPosts();
   }, [dispatch, userInfo]);
+
 
   if (isLoading) return <p>Loading...</p>;
   
@@ -89,7 +90,7 @@ export default function Home() {
               />
             ))}
             <div className="fixed bottom-5 right-75">
-              <AddPostButton />
+              {userInfo && <AddPostButton />}
             </div>
           </div>
         </div>

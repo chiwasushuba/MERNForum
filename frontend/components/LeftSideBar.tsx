@@ -50,12 +50,16 @@ const LeftSideBar = () => {
           </nav>
 
           <div className="flex mt-auto">
-            <Link
+            {userId ? <Link
               onClick={handleLogout} 
               href="/login" 
               className="p-2 w-full hover:bg-gray-200 rounded">
               Logout
+            </Link> : <Link href={"/login"}
+              className="p-2 w-full hover:bg-gray-200 rounded">
+              Login 
             </Link>
+            }
           </div>
         </div>
       </div>
