@@ -50,7 +50,7 @@ io.on('connection', (socket) => {
     socket.data.username = username;
 
     onlineUsers.set(socket.id, { userId, username });
-    console.log(`User ${username} (${userId}) joined`);
+    console.log(`User ${username} joined`);
 
     // Send updated list to everyone
     io.emit('online_users', Array.from(onlineUsers.values()));
@@ -68,9 +68,6 @@ io.on('connection', (socket) => {
     }
   });
 });
-
-
-
 // ABOVE IS THE SOCKET.IO IMPLEMENTATION
 
 
@@ -82,6 +79,7 @@ app.use(express.json());
 
 // IMPORTANT: Serve static files from uploads directory (for multer)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // Middleware
 app.use((req, res, next) => {
@@ -96,8 +94,6 @@ app.use("/api/post", postRoutes);
 app.use("/api/otp", otpRoutes)
 app.use("/api/search", searchRoutes)
 app.use("/api/messages", messageRoutes)
-
-
 
 
 // Connect DB and Server Start
