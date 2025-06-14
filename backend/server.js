@@ -50,7 +50,7 @@ io.on('connection', (socket) => {
     socket.data.username = username;
 
     onlineUsers.set(socket.id, { userId, username });
-    console.log(`User ${username} joined`);
+    console.log(`User ${username} (${userId}) joined`);
 
     // Send updated list to everyone
     io.emit('online_users', Array.from(onlineUsers.values()));

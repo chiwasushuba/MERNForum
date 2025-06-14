@@ -29,6 +29,8 @@ export default function ChatPage() {
   useEffect(() => {
     if (!authIsReady || !userInfo) return;
 
+    document.title = `Flux Talk`;
+
     const socketInstance = io('http://localhost:4000');
     setSocket(socketInstance);
 
