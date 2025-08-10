@@ -3,11 +3,6 @@
 
 This is a web forum app similar to Twitter(X) where I use the MERN stack to develop this application to help familiarize how web development works. This helps me get to know Typescript, TailwindCSS, React, NextJS, Node, Express, MongoDB, Nodemailer, Multer, and Firebase for my cloud storage where I store the images for deployment.
 
-## 📸 Demo (fully functional finally) 
-
-- https://mernforum-frontend.onrender.com
-
-
 ## 📂 Features
 
 - OTP verification for email
