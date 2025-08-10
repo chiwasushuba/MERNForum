@@ -1,47 +1,78 @@
+# 🚀 MERN Forum
+![MERN Stack](https://img.shields.io/badge/MERN-Stack-4DB33D?logo=mongodb&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)
+![Node.js](https://img.shields.io/badge/Node.js-43853D?logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express.js-404D59?logo=express)
+![MongoDB](https://img.shields.io/badge/MongoDB-4DB33D?logo=mongodb&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-FFCA28?logo=firebase&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-38B2AC?logo=tailwind-css&logoColor=white)
 
-# 🚀 MERN Forum 
+A web forum application inspired by Twitter (X), built using the **MERN stack**.  
+This project helped me strengthen my skills in **TypeScript, TailwindCSS, React, Next.js, Node.js, Express, MongoDB**, and other modern web technologies.  
+It also integrates **Firebase** for cloud storage.
 
-This is a web forum app similar to Twitter(X) where I use the MERN stack to develop this application to help familiarize how web development works. This helps me get to know Typescript, TailwindCSS, React, NextJS, Node, Express, MongoDB, Nodemailer, Multer, and Firebase for my cloud storage where I store the images for deployment.
+---
 
 ## 📂 Features
 
-- OTP verification for email
-- Cloud Storage (Firebase) Read and Write in cloud storage
-    - Stored in a folder based on their ID to determine who owns the image (used Data.now() and original filename to name the image)
-    - Processed file uploads using multer that only accepts PNG,JPG, GIF and 5MB of size
-- Sign up and Logging in and out
-- Basic CRUD for the profile, posts
-- Hashed Passwords
+- **OTP email verification**
+- **Cloud Storage (Firebase)** – organized by user ID  
+  - Filenames generated with `Date.now()` + original filename  
+  - Multer for file uploads (PNG, JPG, GIF only, max 5MB)
+- **Authentication** – Sign up, log in, log out
+- **Basic CRUD** – Profiles and posts
+- **Security** – Hashed passwords
+
+---
 
 ## 🛠️ Tech Stack
 
-**Frontend:** React, TailwindCSS, Typescript  
+**Frontend:** React, TailwindCSS, TypeScript  
 **Backend:** Node.js, Express, Multer, Firebase  
-**Database:** MongoDB
+**Database:** MongoDB  
 
-**Others:** Nodemailer, Validator, JSON Webtokens, DotEnv, OTPGenerator, bcrypt
+**Others:** Nodemailer, Validator, JSON Web Tokens (JWT), DotEnv, OTP Generator, bcrypt
 
-## These are my ENV files that I use while developing the web application
-```markdown
-# Add a env File [BACKEND] (.env)
+---
 
-- PORT=4000
-- MONGO_URI=mongodb+srv://chiwasushuba:<db_password>@mernapp.9gzhw5s.mongodb.net/?retryWrites=true&w=majority&appName=MERNapp
-- SECRET=( ? ) mkns
-- 
-### For OTP
-- EMAIL_USER=joshuaprogrammingnotes@gmail.com
-- EMAIL_PASS=(passApp in google)
+## 🔑 Environment Variables
 
-### For my cloud storage (firebase)
-- FIREBASE_PROJECT_ID
-- FIREBASE_PRIVATE_KEY_ID
-- FIREBASE_PRIVATE_KEY
-- FIREBASE_CLIENT_EMAIL
+This project requires both backend (`.env`) and frontend (`.env.local`) configuration.  
+To prevent exposing sensitive information, please **contact me directly** for the exact `.env` setup.
 
-# Add a env.local file [FRONTEND] (.env.local)
-- NEXT_PUBLIC_API_URL=http://localhost:4000
+---
 
-```
+## 📦 Installation & Setup
 
-## GGS
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/chiwasushuba/MERNForum.git
+   cd MERNForum
+2. **Install dependencies**
+   ```bash
+   # Backend
+    cd backend
+    npm install
+    
+    # Frontend
+    cd ../frontend
+    npm install
+   ```
+3. **Set up environment variables (ask me for details)**
+4. Run the application
+   ```bash
+    # Backend
+    cd backend
+    npm run dev
+    
+    # Frontend
+    cd ../frontend
+    npm run dev
+   ```
+---
+
+## Notes
+- Image uploads are stored in Firebase Storage and organized per user.
+- Passwords are encrypted with bcrypt.
+- OTP email verification is handled via Nodemailer.
