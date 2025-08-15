@@ -28,12 +28,13 @@ const io = new Server(server, {
 // Online users tracking
 const onlineUsers = new Map();
 
+
 io.on('connection', (socket) => {
-  console.log('Socket connected:', socket.id);
+  console.log(`Socket connected: ${socket.id}`);
 
   socket.on('join', ({ userId, username }) => {
     if (!userId || !username) {
-      console.warn('Join event missing userId or username');
+      console.log('Join event missing userId or username');
       return;
     }
 
@@ -48,7 +49,9 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    console.log('Socket disconnected:', socket.id);
+    if (socket.data.username) {
+      console.log(`User ${socket.data.username} (${socket.data.userId}) disconnected`);
+    }
     onlineUsers.delete(socket.id);
     io.emit('online_users', Array.from(onlineUsers.values()));
   });

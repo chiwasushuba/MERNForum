@@ -38,10 +38,9 @@ export default function ChatPage() {
     socketInstance.on('connect', () => {
       console.log('Connected to socket server');
 
-      // Emit join as soon as auth and username are ready
       if (authIsReady && userInfo?.username) {
         socketInstance.emit('join', {
-          userId: userInfo._id,
+          userId: userInfo.userId, // changed here
           username: userInfo.username
         });
       }
@@ -49,7 +48,7 @@ export default function ChatPage() {
 
     socketInstance.on('online_users', (users: OnlineUser[]) => {
       console.log('Online users update:', users);
-      setOnlineUsers(users.filter((u) => u.userId !== userInfo._id));
+      setOnlineUsers(users.filter((u) => u.userId !== userInfo.userId)); // changed here
     });
 
     socketInstance.on('receive_message', (data: Message) => {
@@ -73,7 +72,7 @@ export default function ChatPage() {
     if (!newMessage.trim() || !selectedUser || !socket) return;
 
     const messageData: Message = {
-      senderId: userInfo._id,
+      senderId: userInfo.userId, // changed here
       receiverId: selectedUser.userId,
       content: newMessage.trim(),
     };
@@ -99,7 +98,7 @@ export default function ChatPage() {
 
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/messages/history/${userInfo._id}/${user.userId}`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/messages/history/${userInfo.userId}/${user.userId}` // changed here
       );
       setMessages(res.data || []);
     } catch (err) {
@@ -144,12 +143,12 @@ export default function ChatPage() {
                 <div
                   key={i}
                   className={`mb-2 ${
-                    msg.senderId === userInfo._id ? 'text-right' : 'text-left'
+                    msg.senderId === userInfo.userId ? 'text-right' : 'text-left'
                   }`}
                 >
                   <span
                     className={`inline-block px-3 py-1 rounded ${
-                      msg.senderId === userInfo._id
+                      msg.senderId === userInfo.userId
                         ? 'bg-blue-500 text-white'
                         : 'bg-gray-300'
                     }`}
