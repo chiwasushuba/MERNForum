@@ -1,20 +1,18 @@
 const express = require('express');
-const router = express.Router();
-const {
-  sendMessage,
-  getMessages,
-  markAsRead,
-  softDeleteMessage,
-  updateMessage,
-  deleteMessage,
-} = require('../controllers/messageController');
-const requireAuth = require("../middleware/requireAuth")
+const requireAuth = require('../middleware/requireAuth');
 
-router.post('/send', requireAuth , sendMessage);
-router.get('/history/:userId', requireAuth , getMessages);
-router.patch('/read/:messageId', requireAuth ,markAsRead);
-router.delete('/:messageId', requireAuth , softDeleteMessage);
-router.patch('/:messageId', updateMessage);
-router.delete('/:messageId', deleteMessage);
+module.exports = (io) => {
+  const router = express.Router();
+  const messageController = require('../controllers/messageController')(io);
 
-module.exports = router;
+  router.use(requireAuth);
+
+  router.post('/send', messageController.sendMessage);
+  router.get('/:userId', messageController.getMessages);
+  router.patch('/read/:messageId', messageController.markAsRead);
+  router.patch('/delete/:messageId', messageController.softDeleteMessage);
+  router.patch('/edit/:messageId', messageController.updateMessage);
+  router.delete('/:messageId', messageController.deleteMessage);
+
+  return router;
+};
