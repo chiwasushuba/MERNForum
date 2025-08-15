@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { useAuthContext } from '@/hooks/useAuthContext';
 import axios from 'axios';
 
@@ -24,26 +24,36 @@ export default function ChatPage() {
   const [selectedUser, setSelectedUser] = useState<OnlineUser | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const [socket, setSocket] = useState<any>(null);
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
     if (!authIsReady || !userInfo) return;
 
-    document.title = `Flux Talk`;
+    document.title = 'Flux Talk';
 
-    const socketInstance = io('http://localhost:4000');
-    setSocket(socketInstance);
+    const socketInstance = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000', {
+      transports: ['websocket'],
+    });
 
     socketInstance.on('connect', () => {
-      socketInstance.emit('join', userInfo);
+      console.log('Connected to socket server');
+
+      // Emit join as soon as auth and username are ready
+      if (authIsReady && userInfo?.username) {
+        socketInstance.emit('join', {
+          userId: userInfo._id,
+          username: userInfo.username
+        });
+      }
     });
 
     socketInstance.on('online_users', (users: OnlineUser[]) => {
-      const others = users.filter((u) => u.userId !== userInfo._id);
-      setOnlineUsers(others);
+      console.log('Online users update:', users);
+      setOnlineUsers(users.filter((u) => u.userId !== userInfo._id));
     });
 
     socketInstance.on('receive_message', (data: Message) => {
+      console.log('Received message:', data);
       if (
         selectedUser &&
         (data.senderId === selectedUser.userId || data.receiverId === selectedUser.userId)
@@ -51,6 +61,8 @@ export default function ChatPage() {
         setMessages((prev) => [...prev, data]);
       }
     });
+
+    setSocket(socketInstance);
 
     return () => {
       socketInstance.disconnect();
@@ -63,20 +75,25 @@ export default function ChatPage() {
     const messageData: Message = {
       senderId: userInfo._id,
       receiverId: selectedUser.userId,
-      content: newMessage,
+      content: newMessage.trim(),
     };
 
     socket.emit('send_message', messageData);
 
-    // Optionally store it in DB
-    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/messages/send`, messageData);
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/messages/send`,
+        messageData
+      );
+      setMessages((prev) => [...prev, res.data || messageData]);
+    } catch (err) {
+      console.error('Error sending message:', err);
+    }
 
-    setMessages((prev) => [...prev, { ...messageData }]);
     setNewMessage('');
   };
 
   const handleSelectUser = async (user: OnlineUser) => {
-    if (user.userId === userInfo._id) return;
     setSelectedUser(user);
     setMessages([]);
 
@@ -84,7 +101,7 @@ export default function ChatPage() {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/api/messages/history/${userInfo._id}/${user.userId}`
       );
-      setMessages(res.data);
+      setMessages(res.data || []);
     } catch (err) {
       console.error('Error fetching message history:', err);
     }
