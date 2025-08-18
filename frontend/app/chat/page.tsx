@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuthContext } from '@/hooks/useAuthContext';
 import axios from 'axios';
@@ -10,7 +10,7 @@ type OnlineUser = {
   username: string;
 };
 
-type Message = {
+type ChatMessage = {
   _id?: string;
   senderId: string;
   receiverId?: string;
@@ -22,42 +22,46 @@ export default function ChatPage() {
   const { userInfo, authIsReady } = useAuthContext();
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
   const [selectedUser, setSelectedUser] = useState<OnlineUser | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [draftMessage, setDraftMessage] = useState('');
   const [socket, setSocket] = useState<Socket | null>(null);
 
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll whenever messages change
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages]);
+
+  // Setup socket connection once
   useEffect(() => {
     if (!authIsReady || !userInfo) return;
 
     document.title = 'Flux Talk';
 
-    const socketInstance = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000', {
+    const socketInstance = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000', {
       transports: ['websocket'],
+      withCredentials: true,
     });
 
     socketInstance.on('connect', () => {
-      console.log('Connected to socket server');
-
-      if (authIsReady && userInfo?.username) {
-        socketInstance.emit('join', {
-          userId: userInfo.userId, // changed here
-          username: userInfo.username
-        });
-      }
+      console.log('✅ Connected to socket server');
+      socketInstance.emit('join', {
+        userId: userInfo.userId,
+        username: userInfo.username,
+      });
     });
 
     socketInstance.on('online_users', (users: OnlineUser[]) => {
-      console.log('Online users update:', users);
-      setOnlineUsers(users.filter((u) => u.userId !== userInfo.userId)); // changed here
+      setOnlineUsers(users.filter((u) => u.userId !== userInfo.userId));
     });
 
-    socketInstance.on('receive_message', (data: Message) => {
-      console.log('Received message:', data);
+    socketInstance.on('receive_message', (data: ChatMessage) => {
       if (
         selectedUser &&
         (data.senderId === selectedUser.userId || data.receiverId === selectedUser.userId)
       ) {
-        setMessages((prev) => [...prev, data]);
+        setChatMessages((prev) => [...prev, data]);
       }
     });
 
@@ -66,47 +70,48 @@ export default function ChatPage() {
     return () => {
       socketInstance.disconnect();
     };
-  }, [authIsReady, userInfo, selectedUser]);
+  }, [authIsReady, userInfo]); // removed `selectedUser` to avoid reconnecting every time
 
   const sendMessage = async () => {
-    if (!newMessage.trim() || !selectedUser || !socket) return;
+    if (!draftMessage.trim() || !selectedUser || !socket) return;
 
-    const messageData: Message = {
-      senderId: userInfo.userId, // changed here
+    const messageData: ChatMessage = {
+      senderId: userInfo.userId,
       receiverId: selectedUser.userId,
-      content: newMessage.trim(),
+      content: draftMessage.trim(),
     };
 
+    // Emit via socket
     socket.emit('send_message', messageData);
 
     try {
       const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/messages/send`,
-        messageData
+        `${process.env.NEXT_PUBLIC_API_URL}/api/chat/send`,
+        messageData,
+        { withCredentials: true }
       );
-      setMessages((prev) => [...prev, res.data || messageData]);
+      setChatMessages((prev) => [...prev, res.data || messageData]);
     } catch (err) {
-      console.error('Error sending message:', err);
+      console.error('❌ Error sending message:', err);
     }
 
-    setNewMessage('');
+    setDraftMessage('');
   };
 
-  const handleSelectUser = async (user: OnlineUser) => {
+  const openChatWithUser = async (user: OnlineUser) => {
     setSelectedUser(user);
-    setMessages([]);
+    setChatMessages([]);
 
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/messages/history/${userInfo.userId}/${user.userId}` // changed here
+        `${process.env.NEXT_PUBLIC_API_URL}/api/chat/history/${user.userId}`,
+        { withCredentials: true }
       );
-      setMessages(res.data || []);
+      setChatMessages(res.data || []);
     } catch (err) {
-      console.error('Error fetching message history:', err);
+      console.error('❌ Error fetching message history:', err);
     }
   };
-
-  if (!authIsReady) return <p>Loading...</p>;
 
   return (
     <div className="p-6 flex gap-6">
@@ -120,7 +125,7 @@ export default function ChatPage() {
               className={`cursor-pointer hover:underline ${
                 selectedUser?.userId === u.userId ? 'font-bold text-blue-500' : ''
               }`}
-              onClick={() => handleSelectUser(u)}
+              onClick={() => openChatWithUser(u)}
             >
               {u.username}
             </li>
@@ -136,10 +141,10 @@ export default function ChatPage() {
               Chatting with <span className="text-green-600">{selectedUser.username}</span>
             </h2>
             <div className="border rounded p-3 h-[300px] overflow-y-auto bg-gray-100 mb-3">
-              {messages.length === 0 && (
+              {chatMessages.length === 0 && (
                 <p className="text-sm text-gray-500">No messages yet.</p>
               )}
-              {messages.map((msg, i) => (
+              {chatMessages.map((msg, i) => (
                 <div
                   key={i}
                   className={`mb-2 ${
@@ -157,13 +162,14 @@ export default function ChatPage() {
                   </span>
                 </div>
               ))}
+              <div ref={chatEndRef} />
             </div>
             <div className="flex gap-2">
               <input
                 className="border rounded p-2 flex-1"
                 placeholder="Type a message..."
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
+                value={draftMessage}
+                onChange={(e) => setDraftMessage(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
               />
               <button

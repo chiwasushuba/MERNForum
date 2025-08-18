@@ -2,7 +2,9 @@ const Message = require('../models/messageModel');
 const Conversation = require('../models/conversationModel');
 
 module.exports = (io) => {
-  // Send a message
+  // ======================
+  // 📩 Send a message
+  // ======================
   const sendMessage = async (req, res) => {
     try {
       const senderId = req.user._id;
@@ -32,13 +34,13 @@ module.exports = (io) => {
       });
 
       if (existingConversation) {
-        existingConversation.lastMessage = content;
+        existingConversation.lastMessage = newMessage._id; // ✅ store ObjectId
         existingConversation.lastMessageAt = new Date();
         await existingConversation.save();
       } else {
         await Conversation.create({
           members: [senderId, receiverId],
-          lastMessage: content,
+          lastMessage: newMessage._id, // ✅ store ObjectId
           lastMessageAt: new Date(),
         });
       }
@@ -46,11 +48,14 @@ module.exports = (io) => {
       res.status(201).json({ ...newMessage.toObject(), isDelivered });
     } catch (err) {
       console.error('Error sending message:', err);
-      res.status(500).json({ message: 'Error sending message', error: err.message });
+      res.status(500).json({ success: false, message: 'Error sending message', error: err.message });
     }
   };
 
-  // Get all messages between two users
+
+  // ======================
+  // 📜 Get messages between two users
+  // ======================
   const getMessages = async (req, res) => {
     try {
       const userId1 = req.user._id;
@@ -62,61 +67,85 @@ module.exports = (io) => {
           { senderId: userId2, receiverId: userId1 },
         ],
         isDeleted: false,
-      }).sort({ timestamp: 1 });
+      }).sort({ createdAt: 1 });
 
-      res.status(200).json(messages);
+      res.status(200).json({ conversation: messages });
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ success: false, error: err.message });
     }
   };
 
-  // Mark message as read
+  // ======================
+  // ✅ Mark message as read
+  // ======================
   const markAsRead = async (req, res) => {
     try {
       const { messageId } = req.params;
-      const updated = await Message.findByIdAndUpdate(messageId, { isRead: true }, { new: true });
-      res.json(updated);
+      const updated = await Message.findByIdAndUpdate(
+        messageId,
+        { isRead: true },
+        { new: true }
+      );
+
+      res.json({ success: true, data: updated });
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ success: false, error: err.message });
     }
   };
 
-  // Soft delete message
+  // ======================
+  // 🗑️ Soft delete message
+  // ======================
   const softDeleteMessage = async (req, res) => {
     try {
       const { messageId } = req.params;
-      const updated = await Message.findByIdAndUpdate(messageId, { isDeleted: true }, { new: true });
+      const updated = await Message.findByIdAndUpdate(
+        messageId,
+        { isDeleted: true },
+        { new: true }
+      );
+
       res.json({ success: true, data: updated });
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ success: false, error: err.message });
     }
   };
 
-  // Edit a message
+  // ======================
+  // ✏️ Edit a message
+  // ======================
   const updateMessage = async (req, res) => {
     try {
       const { messageId } = req.params;
       const { newContent } = req.body;
+
+      if (!newContent) {
+        return res.status(400).json({ success: false, message: 'newContent is required' });
+      }
 
       const updated = await Message.findByIdAndUpdate(
         messageId,
         { content: newContent },
         { new: true }
       );
-      res.status(200).json(updated);
+
+      res.status(200).json({ success: true, data: updated });
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ success: false, error: err.message });
     }
   };
 
-  // Hard delete message
+  // ======================
+  // ❌ Hard delete message
+  // ======================
   const deleteMessage = async (req, res) => {
     try {
       const { messageId } = req.params;
       const message = await Message.findByIdAndDelete(messageId);
-      res.status(200).json({ message: 'Message deleted successfully', data: message });
+
+      res.status(200).json({ success: true, message: 'Message deleted successfully', data: message });
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ success: false, error: err.message });
     }
   };
 

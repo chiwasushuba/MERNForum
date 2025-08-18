@@ -73,13 +73,13 @@ const userRoutes = require('./routes/userRoute');
 const postRoutes = require('./routes/postRoute');
 const otpRoutes = require("./routes/otpRoute");
 const searchRoutes = require("./routes/searchRoute");
-const messageRoutes = require('./routes/messageRoute')(io); // need io here because of socket.io integration
+const chatRoutes = require('./routes/chatRoute')(io); // need io here because of socket.io integration
 
 app.use("/api/user", userRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/otp", otpRoutes);
 app.use("/api/search", searchRoutes);
-app.use("/api/messages", messageRoutes);
+app.use("/api/chat", chatRoutes);
 
 // Connect DB and start server
 mongoose.connect(process.env.MONGO_URI)
