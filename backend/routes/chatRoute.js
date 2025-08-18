@@ -8,11 +8,12 @@ module.exports = (io) => {
   router.use(requireAuth);
 
   router.post('/send', chatController.sendMessage);
-  router.get('/:userId', chatController.getMessages);
+  router.get('/conversation/:conversationId', chatController.getMessages);
   router.patch('/read/:messageId', chatController.markAsRead);
   router.patch('/delete/:messageId', chatController.softDeleteMessage);
   router.patch('/edit/:messageId', chatController.updateMessage);
   router.delete('/:messageId', chatController.deleteMessage);
+  router.delete('/conversation/:conversationId', chatController.deleteConversation);
 
   return router;
 };

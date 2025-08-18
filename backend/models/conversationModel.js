@@ -3,7 +3,7 @@ const { Schema } = mongoose;
 
 const conversationSchema = new Schema(
   {
-    members: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    members: [{ type: Schema.Types.ObjectId, ref: "User", required: true }],
     isGroup: { type: Boolean, default: false },
     groupName: { type: String },
     groupAvatar: { type: String },
@@ -21,7 +21,7 @@ const conversationSchema = new Schema(
   { timestamps: true }
 );
 
-// Helpful indexes
+// ✅ Helpful indexes
 conversationSchema.index({ members: 1 });
 conversationSchema.index({ lastMessageAt: -1 });
 

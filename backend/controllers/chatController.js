@@ -10,40 +10,40 @@ module.exports = (io) => {
       const senderId = req.user._id;
       const { receiverId, content } = req.body;
 
-      // Save the message
+      // Find or create the conversation
+      let conversation = await Conversation.findOne({
+        members: { $all: [senderId, receiverId] },
+      });
+
+      if (!conversation) {
+        conversation = await Conversation.create({
+          members: [senderId, receiverId],
+        });
+      }
+
+      // Save the message linked to conversation
       let newMessage = await Message.create({
         content,
         senderId,
         receiverId,
+        conversationId: conversation._id,
       });
 
       let isDelivered = false;
 
-      // Check if receiver is online and in the room
+      // Check if receiver is online
       const sockets = await io.in(receiverId.toString()).fetchSockets();
       if (sockets.length > 0) {
         isDelivered = true;
         await Message.findByIdAndUpdate(newMessage._id, { isDelivered: true });
-        newMessage = await Message.findById(newMessage._id); // refresh from DB
+        newMessage = await Message.findById(newMessage._id);
         io.to(receiverId.toString()).emit('new_message', newMessage);
       }
 
-      // Update or create the conversation
-      const existingConversation = await Conversation.findOne({
-        members: { $all: [senderId, receiverId] },
-      });
-
-      if (existingConversation) {
-        existingConversation.lastMessage = newMessage._id; // ✅ store ObjectId
-        existingConversation.lastMessageAt = new Date();
-        await existingConversation.save();
-      } else {
-        await Conversation.create({
-          members: [senderId, receiverId],
-          lastMessage: newMessage._id, // ✅ store ObjectId
-          lastMessageAt: new Date(),
-        });
-      }
+      // Update conversation
+      conversation.lastMessage = newMessage._id;
+      conversation.lastMessageAt = new Date();
+      await conversation.save();
 
       res.status(201).json({ ...newMessage.toObject(), isDelivered });
     } catch (err) {
@@ -54,26 +54,37 @@ module.exports = (io) => {
 
 
   // ======================
-  // 📜 Get messages between two users
+  // 📜 Get messages in a conversation
   // ======================
   const getMessages = async (req, res) => {
     try {
-      const userId1 = req.user._id;
-      const userId2 = req.params.userId;
+      const { conversationId } = req.params;
+
+      // Pagination (?page=1&limit=20)
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 20;
+      const skip = (page - 1) * limit;
 
       const messages = await Message.find({
-        $or: [
-          { senderId: userId1, receiverId: userId2 },
-          { senderId: userId2, receiverId: userId1 },
-        ],
+        conversationId,
         isDeleted: false,
-      }).sort({ createdAt: 1 });
+      })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
 
-      res.status(200).json({ conversation: messages });
+      res.status(200).json({
+        success: true,
+        page,
+        limit,
+        count: messages.length,
+        conversation: messages,
+      });
     } catch (err) {
       res.status(500).json({ success: false, error: err.message });
     }
   };
+
 
   // ======================
   // ✅ Mark message as read
@@ -93,6 +104,7 @@ module.exports = (io) => {
     }
   };
 
+
   // ======================
   // 🗑️ Soft delete message
   // ======================
@@ -110,6 +122,7 @@ module.exports = (io) => {
       res.status(500).json({ success: false, error: err.message });
     }
   };
+
 
   // ======================
   // ✏️ Edit a message
@@ -135,6 +148,7 @@ module.exports = (io) => {
     }
   };
 
+
   // ======================
   // ❌ Hard delete message
   // ======================
@@ -149,6 +163,31 @@ module.exports = (io) => {
     }
   };
 
+
+  // ======================
+  // 🗑️ Hard delete entire conversation
+  // ======================
+  const deleteConversation = async (req, res) => {
+    try {
+      const { conversationId } = req.params;
+
+      // Delete all messages in the conversation
+      const result = await Message.deleteMany({ conversationId });
+
+      // Delete the conversation itself
+      await Conversation.findByIdAndDelete(conversationId);
+
+      res.status(200).json({
+        success: true,
+        deletedCount: result.deletedCount,
+        message: "Conversation and all messages deleted permanently",
+      });
+    } catch (err) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  };
+
+
   return {
     sendMessage,
     getMessages,
@@ -156,5 +195,6 @@ module.exports = (io) => {
     softDeleteMessage,
     updateMessage,
     deleteMessage,
+    deleteConversation,
   };
 };

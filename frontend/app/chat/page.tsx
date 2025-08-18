@@ -26,15 +26,25 @@ export default function ChatPage() {
   const [draftMessage, setDraftMessage] = useState('');
   const [socket, setSocket] = useState<Socket | null>(null);
 
+  const [cursor, setCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [conversationExists, setConversationExists] = useState<boolean>(false);
+
+  const [chatCache, setChatCache] = useState<
+    Record<string, { messages: ChatMessage[]; cursor: string | null; hasMore: boolean; exists: boolean }>
+  >({});
+
   const token = userInfo?.token || '';
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatBoxRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [chatMessages]);
+    if (chatMessages.length && !loadingMore) {
+      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatMessages, loadingMore]);
 
-  // Setup socket connection once
   useEffect(() => {
     if (!authIsReady || !userInfo) return;
 
@@ -57,20 +67,28 @@ export default function ChatPage() {
       setOnlineUsers(users.filter((u) => u.userId !== userInfo.userId));
     });
 
-    // ✅ Listen for messages but ignore your own to prevent duplicates
     socketInstance.on('receive_message', (data: ChatMessage) => {
       if (
         selectedUser &&
         (data.senderId === selectedUser.userId || data.receiverId === selectedUser.userId)
       ) {
-        if (data.senderId !== userInfo.userId) {
-          setChatMessages((prev) => [...prev, data]);
-        }
+        setChatMessages((prev) => {
+          if (prev.some((msg) => msg._id === data._id)) return prev;
+          return [...prev, data];
+        });
+        setConversationExists(true);
+        setChatCache((prev) => ({
+          ...prev,
+          [selectedUser.userId]: {
+            ...(prev[selectedUser.userId] || { cursor: null, hasMore: true }),
+            exists: true,
+            messages: [...(prev[selectedUser.userId]?.messages || []), data],
+          },
+        }));
       }
     });
 
     setSocket(socketInstance);
-
     return () => {
       socketInstance.disconnect();
     };
@@ -83,13 +101,21 @@ export default function ChatPage() {
       senderId: userInfo.userId,
       receiverId: selectedUser.userId,
       content: draftMessage.trim(),
-      timestamp: new Date().toISOString(), // ✅ so it renders immediately with a time
+      timestamp: new Date().toISOString(),
     };
 
-    // 👀 Update UI instantly for YOUR side only
     setChatMessages((prev) => [...prev, messageData]);
+    setConversationExists(true);
 
-    // Emit via socket
+    setChatCache((prev) => ({
+      ...prev,
+      [selectedUser.userId]: {
+        ...(prev[selectedUser.userId] || { cursor: null, hasMore: true }),
+        exists: true,
+        messages: [...(prev[selectedUser.userId]?.messages || []), messageData],
+      },
+    }));
+
     socket.emit('send_message', messageData);
 
     try {
@@ -106,90 +132,144 @@ export default function ChatPage() {
   };
 
   const openChatWithUser = async (user: OnlineUser) => {
+    setSelectedUser(user);
+
+    if (chatCache[user.userId]) {
+      setChatMessages(chatCache[user.userId].messages);
+      setCursor(chatCache[user.userId].cursor);
+      setHasMore(chatCache[user.userId].hasMore);
+      setConversationExists(chatCache[user.userId].exists);
+      return;
+    }
+
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/chat/${user.userId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/chat/${user.userId}?limit=20`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (res.data && res.data.conversation) {
-        setChatMessages(res.data.conversation); // ✅ sets history properly
-        setSelectedUser(user);
-      }
+      const messages = res.data.messages || [];
+      const nextCursor = res.data.nextCursor || null;
+      const exists = !!res.data.conversation;
+
+      setChatMessages(messages);
+      setCursor(nextCursor);
+      setHasMore(!!nextCursor);
+      setConversationExists(exists);
+
+      setChatCache((prev) => ({
+        ...prev,
+        [user.userId]: { messages, cursor: nextCursor, hasMore: !!nextCursor, exists },
+      }));
     } catch (err) {
-      console.error('❌ Error fetching chat history:', err);
+      console.error('❌ Error loading messages:', err);
+    }
+  };
+
+  const loadOlderMessages = async () => {
+    if (!selectedUser || !cursor || loadingMore) return;
+    setLoadingMore(true);
+
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/chat/${selectedUser.userId}?limit=20&cursor=${cursor}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const olderMessages = res.data.messages || [];
+      const nextCursor = res.data.nextCursor || null;
+
+      setChatMessages((prev) => [...olderMessages, ...prev]);
+      setCursor(nextCursor);
+      setHasMore(!!nextCursor);
+
+      setChatCache((prev) => ({
+        ...prev,
+        [selectedUser.userId]: {
+          ...(prev[selectedUser.userId] || { exists: true }),
+          messages: [...olderMessages, ...(prev[selectedUser.userId]?.messages || [])],
+          cursor: nextCursor,
+          hasMore: !!nextCursor,
+          exists: true,
+        },
+      }));
+    } catch (err) {
+      console.error('❌ Error loading older messages:', err);
+    } finally {
+      setLoadingMore(false);
     }
   };
 
   return (
-    <div className="p-6 flex gap-6">
-      {/* Online Users Sidebar */}
-      <div className="w-1/3 border-r pr-4">
-        <h2 className="text-xl font-bold mb-3">🟢 Online Users</h2>
-        <ul className="space-y-2">
-          {onlineUsers.map((u) => (
-            <li
-              key={u.userId}
-              className={`cursor-pointer hover:underline ${
-                selectedUser?.userId === u.userId ? 'font-bold text-blue-500' : ''
-              }`}
-              onClick={() => openChatWithUser(u)}
-            >
-              {u.username}
-            </li>
-          ))}
-        </ul>
+    <div className="flex h-screen">
+      <div className="w-1/4 bg-gray-200 p-4 overflow-y-auto">
+        <h2 className="text-lg font-bold mb-2">Online Users</h2>
+        {onlineUsers.map((user) => (
+          <button
+            key={user.userId}
+            className="block w-full text-left p-2 hover:bg-gray-300 rounded"
+            onClick={() => openChatWithUser(user)}
+          >
+            {user.username}
+          </button>
+        ))}
       </div>
 
-      {/* Chat Area */}
-      <div className="w-2/3">
+      <div className="flex-1 flex flex-col">
         {selectedUser ? (
           <>
-            <h2 className="text-xl font-bold mb-3">
-              Chatting with <span className="text-green-600">{selectedUser.username}</span>
-            </h2>
-            <div className="border rounded p-3 h-[300px] overflow-y-auto bg-gray-100 mb-3">
-              {chatMessages.length === 0 && (
-                <p className="text-sm text-gray-500">No messages yet.</p>
+            <div className="p-4 bg-gray-100 font-semibold border-b">
+              Chat with {selectedUser.username}
+            </div>
+            <div
+              className="flex-1 overflow-y-auto p-4 space-y-2"
+              ref={chatBoxRef}
+              onScroll={(e) => {
+                if ((e.target as HTMLDivElement).scrollTop === 0 && hasMore && !loadingMore) {
+                  loadOlderMessages();
+                }
+              }}
+            >
+              {loadingMore && <p className="text-center text-sm">Loading...</p>}
+              {!conversationExists && (
+                <p className="text-center text-gray-500 text-sm">No messages yet. Say hello 👋</p>
               )}
-              {chatMessages.map((msg, i) => (
+              {chatMessages.map((msg) => (
                 <div
-                  key={msg._id || i}
-                  className={`mb-2 ${
-                    msg.senderId === userInfo?.userId ? 'text-right' : 'text-left'
-                  }`}
+                  key={msg._id || msg.timestamp}
+                  className={`p-2 rounded ${
+                    msg.senderId === userInfo?.userId
+                      ? 'bg-blue-500 text-white ml-auto'
+                      : 'bg-gray-300'
+                  } w-fit`}
                 >
-                  <span
-                    className={`inline-block px-3 py-1 rounded ${
-                      msg.senderId === userInfo?.userId
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-300'
-                    }`}
-                  >
-                    {msg.content}
-                  </span>
+                  {msg.content}
                 </div>
               ))}
               <div ref={chatEndRef} />
             </div>
-            <div className="flex gap-2">
+
+            <div className="p-4 border-t flex">
               <input
-                className="border rounded p-2 flex-1"
-                placeholder="Type a message..."
+                type="text"
                 value={draftMessage}
                 onChange={(e) => setDraftMessage(e.target.value)}
+                className="flex-1 border rounded px-2 py-1"
+                placeholder="Type a message..."
                 onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
               />
               <button
-                className="bg-blue-500 text-white px-4 py-2 rounded"
                 onClick={sendMessage}
+                className="ml-2 bg-blue-500 text-white px-4 py-1 rounded"
               >
                 Send
               </button>
             </div>
           </>
         ) : (
-          <p className="text-gray-600">Select an online user to start chatting.</p>
+          <div className="flex-1 flex items-center justify-center text-gray-500">
+            Select a user to start chatting
+          </div>
         )}
       </div>
     </div>
