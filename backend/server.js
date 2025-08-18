@@ -48,6 +48,16 @@ io.on('connection', (socket) => {
     io.emit('online_users', Array.from(onlineUsers.values()));
   });
 
+  socket.on('send_message', (data) => {
+    console.log(`📩 Message from ${data.senderId} to ${data.receiverId}: ${data.content}`);
+
+    // Send message only to the receiver
+    io.to(data.receiverId).emit('receive_message', data);
+
+    // (Optional) also send back to sender so it gets synced (e.g. timestamp update)
+    io.to(data.senderId).emit('receive_message', data);
+  });
+
   socket.on('disconnect', () => {
     if (socket.data.username) {
       console.log(`User ${socket.data.username} (${socket.data.userId}) disconnected`);
@@ -56,6 +66,7 @@ io.on('connection', (socket) => {
     io.emit('online_users', Array.from(onlineUsers.values()));
   });
 });
+
 
 
 // Middleware

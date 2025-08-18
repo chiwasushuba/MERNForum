@@ -26,9 +26,10 @@ export default function ChatPage() {
   const [draftMessage, setDraftMessage] = useState('');
   const [socket, setSocket] = useState<Socket | null>(null);
 
+  const token = userInfo?.token || '';
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll whenever messages change
+  // Auto-scroll to bottom
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages]);
@@ -39,9 +40,9 @@ export default function ChatPage() {
 
     document.title = 'Flux Talk';
 
-    const socketInstance = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000', {
+    const socketInstance = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000', {
       transports: ['websocket'],
-      withCredentials: true,
+      extraHeaders: { Authorization: `Bearer ${token}` },
     });
 
     socketInstance.on('connect', () => {
@@ -56,12 +57,15 @@ export default function ChatPage() {
       setOnlineUsers(users.filter((u) => u.userId !== userInfo.userId));
     });
 
+    // ✅ Listen for messages but ignore your own to prevent duplicates
     socketInstance.on('receive_message', (data: ChatMessage) => {
       if (
         selectedUser &&
         (data.senderId === selectedUser.userId || data.receiverId === selectedUser.userId)
       ) {
-        setChatMessages((prev) => [...prev, data]);
+        if (data.senderId !== userInfo.userId) {
+          setChatMessages((prev) => [...prev, data]);
+        }
       }
     });
 
@@ -70,27 +74,30 @@ export default function ChatPage() {
     return () => {
       socketInstance.disconnect();
     };
-  }, [authIsReady, userInfo]); // removed `selectedUser` to avoid reconnecting every time
+  }, [authIsReady, userInfo, selectedUser, token]);
 
   const sendMessage = async () => {
-    if (!draftMessage.trim() || !selectedUser || !socket) return;
+    if (!draftMessage.trim() || !selectedUser || !socket || !userInfo) return;
 
     const messageData: ChatMessage = {
       senderId: userInfo.userId,
       receiverId: selectedUser.userId,
       content: draftMessage.trim(),
+      timestamp: new Date().toISOString(), // ✅ so it renders immediately with a time
     };
+
+    // 👀 Update UI instantly for YOUR side only
+    setChatMessages((prev) => [...prev, messageData]);
 
     // Emit via socket
     socket.emit('send_message', messageData);
 
     try {
-      const res = await axios.post(
+      await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/api/chat/send`,
         messageData,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      setChatMessages((prev) => [...prev, res.data || messageData]);
     } catch (err) {
       console.error('❌ Error sending message:', err);
     }
@@ -99,17 +106,18 @@ export default function ChatPage() {
   };
 
   const openChatWithUser = async (user: OnlineUser) => {
-    setSelectedUser(user);
-    setChatMessages([]);
-
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/chat/history/${user.userId}`,
-        { withCredentials: true }
+        `${process.env.NEXT_PUBLIC_API_URL}/api/chat/${user.userId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      setChatMessages(res.data || []);
+
+      if (res.data && res.data.conversation) {
+        setChatMessages(res.data.conversation); // ✅ sets history properly
+        setSelectedUser(user);
+      }
     } catch (err) {
-      console.error('❌ Error fetching message history:', err);
+      console.error('❌ Error fetching chat history:', err);
     }
   };
 
@@ -146,14 +154,14 @@ export default function ChatPage() {
               )}
               {chatMessages.map((msg, i) => (
                 <div
-                  key={i}
+                  key={msg._id || i}
                   className={`mb-2 ${
-                    msg.senderId === userInfo.userId ? 'text-right' : 'text-left'
+                    msg.senderId === userInfo?.userId ? 'text-right' : 'text-left'
                   }`}
                 >
                   <span
                     className={`inline-block px-3 py-1 rounded ${
-                      msg.senderId === userInfo.userId
+                      msg.senderId === userInfo?.userId
                         ? 'bg-blue-500 text-white'
                         : 'bg-gray-300'
                     }`}
