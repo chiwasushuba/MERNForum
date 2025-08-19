@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuthContext } from '@/hooks/useAuthContext';
-import axios from 'axios';
 
 type OnlineUser = {
   userId: string;
@@ -11,11 +10,10 @@ type OnlineUser = {
 };
 
 type ChatMessage = {
-  _id?: string;
   senderId: string;
   receiverId?: string;
   content: string;
-  timestamp?: string;
+  timestamp: string;
 };
 
 export default function ChatPage() {
@@ -26,182 +24,69 @@ export default function ChatPage() {
   const [draftMessage, setDraftMessage] = useState('');
   const [socket, setSocket] = useState<Socket | null>(null);
 
-  const [cursor, setCursor] = useState<string | null>(null);
-  const [hasMore, setHasMore] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [conversationExists, setConversationExists] = useState<boolean>(false);
-
-  const [chatCache, setChatCache] = useState<
-    Record<string, { messages: ChatMessage[]; cursor: string | null; hasMore: boolean; exists: boolean }>
-  >({});
-
-  const token = userInfo?.token || '';
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const chatBoxRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (chatMessages.length && !loadingMore) {
-      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [chatMessages, loadingMore]);
-
+  // connect to socket.io server
   useEffect(() => {
     if (!authIsReady || !userInfo) return;
 
-    document.title = 'Flux Talk';
-
-    const socketInstance = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000', {
+    const s = io('http://localhost:4000', {
       transports: ['websocket'],
-      extraHeaders: { Authorization: `Bearer ${token}` },
     });
 
-    socketInstance.on('connect', () => {
-      console.log('✅ Connected to socket server');
-      socketInstance.emit('join', {
+    setSocket(s);
+
+    s.on('connect', () => {
+      console.log('connected to socket', s.id);
+
+      // join room with userId
+      s.emit('join', {
         userId: userInfo.userId,
         username: userInfo.username,
       });
     });
 
-    socketInstance.on('online_users', (users: OnlineUser[]) => {
-      setOnlineUsers(users.filter((u) => u.userId !== userInfo.userId));
+    s.on('online_users', (users: OnlineUser[]) => {
+      setOnlineUsers(users.filter(u => u.userId !== userInfo.userId));
     });
 
-    socketInstance.on('receive_message', (data: ChatMessage) => {
-      if (
-        selectedUser &&
-        (data.senderId === selectedUser.userId || data.receiverId === selectedUser.userId)
-      ) {
-        setChatMessages((prev) => {
-          if (prev.some((msg) => msg._id === data._id)) return prev;
-          return [...prev, data];
-        });
-        setConversationExists(true);
-        setChatCache((prev) => ({
-          ...prev,
-          [selectedUser.userId]: {
-            ...(prev[selectedUser.userId] || { cursor: null, hasMore: true }),
-            exists: true,
-            messages: [...(prev[selectedUser.userId]?.messages || []), data],
-          },
-        }));
-      }
+    s.on('receive_message', (msg: ChatMessage) => {
+      setChatMessages(prev => [...prev, msg]);
     });
 
-    setSocket(socketInstance);
     return () => {
-      socketInstance.disconnect();
+      s.disconnect();
     };
-  }, [authIsReady, userInfo, selectedUser, token]);
+  }, [authIsReady, userInfo]);
 
-  const sendMessage = async () => {
-    if (!draftMessage.trim() || !selectedUser || !socket || !userInfo) return;
+  // scroll to bottom on new message
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages]);
 
-    const messageData: ChatMessage = {
+  const openChatWithUser = (user: OnlineUser) => {
+    setSelectedUser(user);
+    setChatMessages([]); // reset since no DB history
+  };
+
+  const sendMessage = () => {
+    if (!socket || !draftMessage.trim() || !selectedUser) return;
+
+    const msg: ChatMessage = {
       senderId: userInfo.userId,
       receiverId: selectedUser.userId,
       content: draftMessage.trim(),
       timestamp: new Date().toISOString(),
     };
 
-    setChatMessages((prev) => [...prev, messageData]);
-    setConversationExists(true);
-
-    setChatCache((prev) => ({
-      ...prev,
-      [selectedUser.userId]: {
-        ...(prev[selectedUser.userId] || { cursor: null, hasMore: true }),
-        exists: true,
-        messages: [...(prev[selectedUser.userId]?.messages || []), messageData],
-      },
-    }));
-
-    socket.emit('send_message', messageData);
-
-    try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/chat/send`,
-        messageData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-    } catch (err) {
-      console.error('❌ Error sending message:', err);
-    }
-
+    socket.emit('send_message', msg);
+    setChatMessages(prev => [...prev, msg]);
     setDraftMessage('');
-  };
-
-  const openChatWithUser = async (user: OnlineUser) => {
-    setSelectedUser(user);
-
-    if (chatCache[user.userId]) {
-      setChatMessages(chatCache[user.userId].messages);
-      setCursor(chatCache[user.userId].cursor);
-      setHasMore(chatCache[user.userId].hasMore);
-      setConversationExists(chatCache[user.userId].exists);
-      return;
-    }
-
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/chat/${user.userId}?limit=20`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      const messages = res.data.messages || [];
-      const nextCursor = res.data.nextCursor || null;
-      const exists = !!res.data.conversation;
-
-      setChatMessages(messages);
-      setCursor(nextCursor);
-      setHasMore(!!nextCursor);
-      setConversationExists(exists);
-
-      setChatCache((prev) => ({
-        ...prev,
-        [user.userId]: { messages, cursor: nextCursor, hasMore: !!nextCursor, exists },
-      }));
-    } catch (err) {
-      console.error('❌ Error loading messages:', err);
-    }
-  };
-
-  const loadOlderMessages = async () => {
-    if (!selectedUser || !cursor || loadingMore) return;
-    setLoadingMore(true);
-
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/chat/${selectedUser.userId}?limit=20&cursor=${cursor}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      const olderMessages = res.data.messages || [];
-      const nextCursor = res.data.nextCursor || null;
-
-      setChatMessages((prev) => [...olderMessages, ...prev]);
-      setCursor(nextCursor);
-      setHasMore(!!nextCursor);
-
-      setChatCache((prev) => ({
-        ...prev,
-        [selectedUser.userId]: {
-          ...(prev[selectedUser.userId] || { exists: true }),
-          messages: [...olderMessages, ...(prev[selectedUser.userId]?.messages || [])],
-          cursor: nextCursor,
-          hasMore: !!nextCursor,
-          exists: true,
-        },
-      }));
-    } catch (err) {
-      console.error('❌ Error loading older messages:', err);
-    } finally {
-      setLoadingMore(false);
-    }
   };
 
   return (
     <div className="flex h-screen">
+      {/* Left: Online users */}
       <div className="w-1/4 bg-gray-200 p-4 overflow-y-auto">
         <h2 className="text-lg font-bold mb-2">Online Users</h2>
         {onlineUsers.map((user) => (
@@ -215,30 +100,19 @@ export default function ChatPage() {
         ))}
       </div>
 
+      {/* Right: Chat box */}
       <div className="flex-1 flex flex-col">
         {selectedUser ? (
           <>
             <div className="p-4 bg-gray-100 font-semibold border-b">
               Chat with {selectedUser.username}
             </div>
-            <div
-              className="flex-1 overflow-y-auto p-4 space-y-2"
-              ref={chatBoxRef}
-              onScroll={(e) => {
-                if ((e.target as HTMLDivElement).scrollTop === 0 && hasMore && !loadingMore) {
-                  loadOlderMessages();
-                }
-              }}
-            >
-              {loadingMore && <p className="text-center text-sm">Loading...</p>}
-              {!conversationExists && (
-                <p className="text-center text-gray-500 text-sm">No messages yet. Say hello 👋</p>
-              )}
-              {chatMessages.map((msg) => (
+            <div className="flex-1 overflow-y-auto p-4 space-y-2">
+              {chatMessages.map((msg, idx) => (
                 <div
-                  key={msg._id || msg.timestamp}
+                  key={idx}
                   className={`p-2 rounded ${
-                    msg.senderId === userInfo?.userId
+                    msg.senderId === userInfo.userId
                       ? 'bg-blue-500 text-white ml-auto'
                       : 'bg-gray-300'
                   } w-fit`}

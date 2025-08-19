@@ -55,7 +55,7 @@ io.on('connection', (socket) => {
     io.to(data.receiverId).emit('receive_message', data);
 
     // (Optional) also send back to sender so it gets synced (e.g. timestamp update)
-    io.to(data.senderId).emit('receive_message', data);
+    // io.to(data.senderId).emit('receive_message', data);
   });
 
   socket.on('disconnect', () => {
