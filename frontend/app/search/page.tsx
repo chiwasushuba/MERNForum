@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import UserPreview from '@/components/UserPreview'
 import PostPreview from '@/components/PostPreview'
+import UserDetailsPostType from '@/types/userType'
 
 interface UserInterface {
   _id: string
@@ -20,17 +21,10 @@ interface UserInterface {
   verified: boolean
 }
 
-interface User {
-  _id: string
-  username: string
-  profile: string
-  verified: boolean
-}
-
 export interface PostInterface {
   _id: string
   title: string
-  user: User
+  user: UserDetailsPostType
   profile: string
   content: string
   image: string

@@ -8,49 +8,16 @@ import ProfileCard from "@/components/ProfileCard";
 import axios from "axios";
 import PostPreview from "@/components/PostPreview";
 import { useAuthContext } from "@/hooks/useAuthContext";
-
-
-interface Post {
-  _id: string;
-  title: string;
-  content: string;
-  image: string;
-  user : {
-    _id: string
-    profile: string;
-    username: string;
-    verified: boolean;
-  };
-  likes: number;
-  dislikes: number;
-}
-
-interface Follow {
-  _id: string;
-  username: string
-}
-
-interface UserDetails {
-  _id: string;
-  email: string,
-  username: string,
-  password: string,
-  profile: string,
-  bio: string,
-  followers: number,
-  following: number,
-  followedBy: Follow[];
-  followingUsers: Follow[];
-  verified: boolean,
-}
-
+import UserDetailsType from "@/types/userDetailsType";
+import PostType from "@/types/postType";
+import FollowType from "@/types/followType";
 
 const ProfileContent = () => {
   const searchParams = useSearchParams();
   const userId = searchParams.get("id");
-  const [userDetails, setUserDetails] = useState<UserDetails>();
+  const [userDetails, setUserDetails] = useState<UserDetailsType>();
   const [loading, setLoading] = useState<boolean>(true);
-  const [posts, setPosts] = useState<Post[]>();
+  const [posts, setPosts] = useState<PostType[]>();
 
   // console.log(userId);
 
@@ -109,7 +76,7 @@ const ProfileContent = () => {
               posts
                 .slice()
                 .reverse()
-                .map((post: Post) => (
+                .map((post: PostType) => (
                   <PostPreview
                     key={post._id}
                     postId={post._id}

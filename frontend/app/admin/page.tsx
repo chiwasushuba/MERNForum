@@ -6,28 +6,11 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
-
-interface Follow {
-  _id: string
-  username: string
-}
-
-interface UserDetails {
-  _id: string
-  email: string
-  username: string
-  password: string
-  profile: string
-  bio: string
-  followers: number
-  following: number
-  followedBy: Follow[]
-  followingUsers: Follow[]
-  verified: boolean
-}
+import UserDetailsType from '@/types/userDetailsType'
+import FollowType from '@/types/followType'
 
 const Page = () => {
-  const [users, setUsers] = useState<UserDetails[]>([])
+  const [users, setUsers] = useState<UserDetailsType[]>([])
 
   useEffect(() => {
     const fetchUsers = async () => {

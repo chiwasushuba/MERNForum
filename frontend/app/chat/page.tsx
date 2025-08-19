@@ -3,24 +3,15 @@
 import { useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuthContext } from '@/hooks/useAuthContext';
+import ChatMessageType from '@/types/chatMessageType';
+import OnlineUserType from '@/types/onlineUserType';
 
-type OnlineUser = {
-  userId: string;
-  username: string;
-};
-
-type ChatMessage = {
-  senderId: string;
-  receiverId?: string;
-  content: string;
-  timestamp: string;
-};
 
 export default function ChatPage() {
   const { userInfo, authIsReady } = useAuthContext();
-  const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
-  const [selectedUser, setSelectedUser] = useState<OnlineUser | null>(null);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [onlineUsers, setOnlineUsers] = useState<OnlineUserType[]>([]);
+  const [selectedUser, setSelectedUser] = useState<OnlineUserType | null>(null);
+  const [chatMessages, setChatMessages] = useState<ChatMessageType[]>([]);
   const [draftMessage, setDraftMessage] = useState('');
   const [socket, setSocket] = useState<Socket | null>(null);
 
@@ -46,11 +37,11 @@ export default function ChatPage() {
       });
     });
 
-    s.on('online_users', (users: OnlineUser[]) => {
+    s.on('online_users', (users: OnlineUserType[]) => {
       setOnlineUsers(users.filter(u => u.userId !== userInfo.userId));
     });
 
-    s.on('receive_message', (msg: ChatMessage) => {
+    s.on('receive_message', (msg: ChatMessageType) => {
       setChatMessages(prev => [...prev, msg]);
     });
 
@@ -64,7 +55,7 @@ export default function ChatPage() {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages]);
 
-  const openChatWithUser = (user: OnlineUser) => {
+  const openChatWithUser = (user: OnlineUserType) => {
     setSelectedUser(user);
     setChatMessages([]); // reset since no DB history
   };
@@ -72,7 +63,7 @@ export default function ChatPage() {
   const sendMessage = () => {
     if (!socket || !draftMessage.trim() || !selectedUser) return;
 
-    const msg: ChatMessage = {
+    const msg: ChatMessageType = {
       senderId: userInfo.userId,
       receiverId: selectedUser.userId,
       content: draftMessage.trim(),
