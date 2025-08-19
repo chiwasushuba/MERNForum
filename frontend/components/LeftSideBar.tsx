@@ -27,42 +27,49 @@ const LeftSideBar = () => {
   }
 
   return (
-    <div className="fixed top-0 left-0 h-screen w-64 overflow-y-auto bg-gray-200 border-r border-gray-300">
-        <div className="flex flex-col p-4 gap-4 h-full">
-          <div className="font-bold text-xl">
-            Flux Talk
-          </div>
+    <div className="fixed top-0 left-0 h-screen w-64 flex flex-col bg-white shadow-lg border-r border-gray-200">
+  {/* App Logo / Title */}
+  <div className="p-4 text-2xl font-bold text-blue-600 border-b">
+    Flux Talk
+  </div>
 
-          <nav className="flex flex-col gap-2 ml-3">
-            <Link href="/" className="p-2 hover:bg-gray-200 rounded">
-              Home
-            </Link>
+  {/* Navigation */}
+  <nav className="flex flex-col p-4 gap-2 text-gray-700 font-medium">
+    <Link href="/" className="p-2 rounded-lg hover:bg-blue-100 transition">
+      Home
+    </Link>
+    <Link href={`/profile?id=${userId}`} className="p-2 rounded-lg hover:bg-blue-100 transition">
+      Profile
+    </Link>
+    <Link href="/settings" className="p-2 rounded-lg hover:bg-blue-100 transition">
+      Settings
+    </Link>
+    <Link href="/chat" className="p-2 rounded-lg hover:bg-blue-100 transition">
+      Messages
+    </Link>
+  </nav>
 
-            <Link href={`/profile?id=${userId}`} className="p-2 hover:bg-gray-200 rounded">
-              Profile
-            </Link>
-            <Link href="/settings" className="p-2 hover:bg-gray-200 rounded">
-              Settings
-            </Link>
-            <Link href="/chat" className="p-2 hover:bg-gray-200 rounded">
-              Messages
-            </Link>
-          </nav>
+  {/* Logout at Bottom */}
+  <div className="mt-auto p-4 border-t">
+    {userId ? (
+      <Link
+        onClick={handleLogout}
+        href="/login"
+        className="block text-center p-2 rounded-lg"
+      >
+        Logout
+      </Link>
+    ) : (
+      <Link
+        href="/login"
+        className="block text-center p-2 rounded-lg"
+      >
+        Login
+      </Link>
+    )}
+  </div>
+</div>
 
-          <div className="flex mt-auto">
-            {userId ? <Link
-              onClick={handleLogout} 
-              href="/login" 
-              className="p-2 w-full hover:bg-gray-200 rounded">
-              Logout
-            </Link> : <Link href={"/login"}
-              className="p-2 w-full hover:bg-gray-200 rounded">
-              Login 
-            </Link>
-            }
-          </div>
-        </div>
-      </div>
   )
 }
 
