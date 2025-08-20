@@ -29,56 +29,31 @@ const getPost = async (req, res) => {
 
 // create a post
 const createPost = async (req, res) => {
-  const {title, content } = req.body
+  const { title, content } = req.body;
 
-  try{
-    const user = req.user
+  try {
+    const user = req.user;
     if (!user) {
-      return res.status(401).json({ error: 'Unauthorized: No user found' });
+      return res.status(401).json({ error: "Unauthorized: No user found" });
     }
 
-    let image = ''
-
-    if(req.file){
-      const fileName = `${user._id}/${Date.now()}-${req.file.originalname}`;
-      const blob = bucket.file(fileName);
-
-      const blobStream = blob.createWriteStream({
-        metadata:{
-          contentType: req.file.mimetype,
-        },
-      })
-
-      await new Promise((resolve, reject) => {
-        blobStream.on("error", (error) => reject(error));
-        blobStream.on("finish", async () => {
-          try {
-            await blob.makePublic(); // ✅ Make the file public after it's uploaded
-      
-            // Generate public URL
-            image = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
-            resolve();
-          } catch (err) {
-            reject(err); // If makePublic fails
-          }
-        });
-      
-        blobStream.end(req.file.buffer);
-      });
+    let image = "";
+    if (req.file) {
+      image = await uploadToS3(req.file, user._id);
     }
 
-    // If there was a file upload error (added by Multer)
     if (req.fileValidationError) {
       return res.status(400).json({ error: req.fileValidationError });
     }
 
-    const post = await Post.create({title, content, image ,user})
+    const post = await Post.create({ title, content, image, user });
 
-    res.status(200).json(post)
-  }catch(error){
-    res.status(400).json({error: error.message})
+    res.status(200).json(post);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
-}
+};
+
 
 // delete a post
 const deletePost = async (req, res) => {
