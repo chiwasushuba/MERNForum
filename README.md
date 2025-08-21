@@ -7,10 +7,12 @@
 ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?logo=firebase&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-38B2AC?logo=tailwind-css&logoColor=white)
+![Amazon S3](https://img.shields.io/badge/Amazon%20S3-569A31?logo=amazons3&logoColor=white)
+
 
 A web forum application inspired by Twitter (X), built using the **MERN stack**.  
 This project helped me strengthen my skills in **TypeScript, TailwindCSS, React, Next.js, Node.js, Express, MongoDB**, and other modern web technologies.  
-It also integrates **Firebase** for cloud storage.
+It also integrates **Firebase** for cloud storage. (I just migrated to S3 because of issues with payment using GCP)
 
 ---
 
