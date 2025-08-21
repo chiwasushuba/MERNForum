@@ -1,7 +1,6 @@
 const multer = require('multer');
 const path = require('path');
 
-// Wala na 
 const storage = multer.memoryStorage();
 
 // File filter to allow only specific image types no videos allowed baka di kayanin ng cloud storage ko
