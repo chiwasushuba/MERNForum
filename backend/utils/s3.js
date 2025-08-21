@@ -1,7 +1,7 @@
 // utils/s3.js
-import { S3Client } from "@aws-sdk/client-s3";
+const { S3Client } = require("@aws-sdk/client-s3");
 
-export const s3 = new S3Client({
+const s3 = new S3Client({
   region: process.env.AWS_REGION,
   credentials: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -9,4 +9,6 @@ export const s3 = new S3Client({
   },
 });
 
-export const bucketName = process.env.AWS_S3_BUCKET_NAME;
+const bucketName = process.env.AWS_S3_BUCKET_NAME;
+
+module.exports = { s3, bucketName };

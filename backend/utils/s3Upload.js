@@ -1,5 +1,7 @@
-import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { s3, bucketName } from "./s3.js";
+// utils/s3Upload.js
+
+const { PutObjectCommand } = require("@aws-sdk/client-s3");
+const { s3, bucketName } = require("./s3");
 
 /**
  * Upload a file buffer to S3
@@ -7,20 +9,22 @@ import { s3, bucketName } from "./s3.js";
  * @param {string} userId - user ID to namespace the file
  * @returns {string} - public URL of uploaded file
  */
-export async function uploadToS3(file, userId) {
+async function s3Upload(file, userId) {
   if (!file) return "";
 
-  const fileName = `/posts/${userId}/${Date.now()}-${file.originalname}`;
+  const fileName = `posts/${userId}/${Date.now()}-${file.originalname}`;
 
   const command = new PutObjectCommand({
     Bucket: bucketName,
     Key: fileName,
     Body: file.buffer,
     ContentType: file.mimetype,
-    ACL: "public-read", 
+    // ACL: "public-read", ❌ remove this since ACLs are disabled
   });
 
   await s3.send(command);
 
   return `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
 }
+
+module.exports = { s3Upload };
