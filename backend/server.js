@@ -85,9 +85,7 @@ const postRoutes = require('./routes/postRoute');
 const otpRoutes = require("./routes/otpRoute");
 const searchRoutes = require("./routes/searchRoute");
 const chatRoutes = require('./routes/chatRoute')(io); // need io here because of socket.io integration
-const authRoutes = require("./routes/authRoute");
 
-app.use("/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/otp", otpRoutes);
