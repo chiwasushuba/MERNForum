@@ -16,7 +16,7 @@ import { X, ImageIcon } from 'lucide-react'
 import { useCreatePost } from "../hooks/useCreatePost"
 import { Textarea } from './ui/textarea'
 import { motion } from 'framer-motion'
-const imageCompression = require('browser-image-compression');
+import imageCompression from 'browser-image-compression';
 
 interface AddPostDivProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
