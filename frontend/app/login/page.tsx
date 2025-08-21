@@ -57,8 +57,27 @@ const Login = () => {
             <p className="text-muted-foreground">Enter your credentials to register an account</p>
           </div>
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          <div className='flex flex-col gap-4 justify-center items-center'>
+            <Button
+              onClick={() => window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`}
+              className="w-full bg-red-500 text-white mt-4"
+            >
+              Continue with Google
+            </Button>
 
+            <Button
+              onClick={() => window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/github`}
+              className="w-full bg-gray-800 text-white mt-2"
+            >
+              Continue with GitHub
+            </Button>
+          </div>
+          {/* or continue with separation */}
+          <div>
+
+          </div>
+
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
               <Input 
@@ -93,7 +112,7 @@ const Login = () => {
           </form>
           {errorOpen && <Label className='text-red-400'>{error}</Label>}
 
-          <div className="text-center mt-4">
+          <div className="flex justify-center text-center mt-4 gap-4">
             <p className="text-muted-foreground">Already have an account?</p>
             <Link
               href="/signup"
@@ -102,12 +121,13 @@ const Login = () => {
               Signup
             </Link>
           </div>
-        </div>
 
-        <div className="text-center text-xs text-muted-foreground mt-4 [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
-          By clicking continue, you agree to our <br />
-          <a href="#" className="mr-2">Terms of Service</a> and
-          <a href="#" className="ml-2">Privacy Policy</a>.
+          <div className="text-center text-xs text-muted-foreground mt-4 [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
+            By clicking continue, you agree to our <br />
+            <a href="#" className="mr-2">Terms of Service</a> and
+            <a href="#" className="ml-2">Privacy Policy</a>.
+          </div>
+
         </div>
       </motion.div>
     </div>

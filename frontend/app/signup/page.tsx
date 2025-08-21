@@ -56,18 +56,6 @@ const Signup = () => {
           </div>
 
           <form className="space-y-4" onSubmit={handleSubmit}>
-
-            {/* Redacted idea signing up with an email */}
-            {/* <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input 
-                id="email" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div> */}
-
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
               <Input 
