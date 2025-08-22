@@ -77,6 +77,22 @@ const SearchContent = () => {
     fetchData()
   }, [query, cleanedQuery])
 
+  const trimmedQuery = cleanedQuery.trim();
+
+  if (!trimmedQuery) {
+    return (
+      <div className="flex justify-around">
+        <LeftSideBar />
+        <div className="bg-gray-100 w-full min-h-screen p-4 flex justify-center items-center">
+          <div className="text-gray-500 text-center">
+            Please enter a search term to see results.
+          </div>
+        </div>
+        <RightSideBar />
+      </div>
+    );
+  }
+
   return (
     <div className="flex justify-around">
       <LeftSideBar />

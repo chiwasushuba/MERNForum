@@ -21,7 +21,7 @@ const SearchBar = () => {
     <form onSubmit={searchEngine}>
       <div className='flex items-center mt-3 gap-2'>
         <Input
-          className='w-auto'
+          className='w-auto border-black'
           placeholder='Search'
           value={search}
           onChange={(e) => setSearch(e.target.value)}

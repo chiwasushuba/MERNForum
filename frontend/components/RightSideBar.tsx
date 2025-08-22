@@ -1,6 +1,4 @@
 import React from 'react'
-// import { Button } from './ui/button'
-// import { Input } from './ui/input'
 import SearchBar from './SearchBar'
 
 
@@ -16,13 +14,14 @@ const RightSideBar = () => {
               <ul className="list-disc pl-5">
                 <li>Like and Dislike</li>
                 <li>Follow and Unfollow</li>
-                <li>To check if user is verified go to their profile</li>
-                <li>To get verified go to settings</li>
-                <li>Delete Post</li>
-                <li>Delete Account</li>
+                <li>User Verification using Email in Settings</li>
+                <li>Delete Account along with their posts</li>
                 <li>Edit Account</li>
-                <li>Every Image is stored in Firebase</li>
-                <li></li>
+                <li>
+                  Every image was stored in <span className="line-through text-gray-500">Firebase</span>, 
+                  now migrated to <span className="font-semibold">AWS S3</span>
+                </li>
+                <li>Search Posts and Users based on similarity of words in posts contents, title and user's name</li>
             </ul>
             </div>
           </div>
