@@ -5,18 +5,17 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 // List of public routes
-const publicRoutes = ["/", "/login", "/signup", "/posts"];
+const publicRoutes = ["/", "/login", "/signup"];
 
 export function RouteGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const pathname = usePathname(); // current route
+  const pathname = usePathname();
   const { userInfo, authIsReady } = useAuthContext();
 
   useEffect(() => {
     if (!authIsReady) return;
 
-    const isPublicRoute =
-      publicRoutes.includes(pathname) || pathname.startsWith("/profile/");
+    const isPublicRoute = publicRoutes.includes(pathname);
 
     if (!userInfo && !isPublicRoute) {
       router.replace("/login");

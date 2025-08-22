@@ -8,7 +8,6 @@ import { useAuthContext } from "@/hooks/useAuthContext";
 import AddPostButton from "@/components/AddPostButton";
 import PostPreview from "@/components/PostPreview";
 
-
 interface Post {
   _id: string;
   title: string;
@@ -24,20 +23,17 @@ interface Post {
   dislikes: number;
 }
 
-
 export default function Home() {
+  const { posts, dispatch } = usePostsContext();
+  const { userInfo } = useAuthContext();
+  const [isLoading, setIsLoading] = useState(true);
 
-  const {posts, dispatch} = usePostsContext();
-  const {userInfo} = useAuthContext();
-  const [isLoading, setIsLoading] = useState(true)
-
-  
   useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
     const fetchPosts = async () => {
-      setIsLoading(true);
       try {
         const headers: HeadersInit = {};
-
         if (userInfo?.token) {
           headers["Authorization"] = `Bearer ${userInfo.token}`;
         }
@@ -46,36 +42,38 @@ export default function Home() {
           headers,
         });
 
-        const json = await response.json();
-
-        if (response.ok) {
-          dispatch({ type: "SET_POSTS", payload: json });
-          document.title = `Flux Talk`;
-        } else {
-          console.error("Failed to fetch posts", json);
+        if (!response.ok) {
+          throw new Error("Backend not ready");
         }
-      } catch (error: unknown) {
-        console.error("Error fetching posts:", error);
-      } finally {
+
+        const json = await response.json();
+        dispatch({ type: "SET_POSTS", payload: json });
         setIsLoading(false);
+        document.title = `Flux Talk`;
+
+        if (intervalId) clearInterval(intervalId); 
+      } catch (error) {
+        console.warn("Backend not ready, retrying in 5s...");
+        setIsLoading(true);
       }
     };
-
-    // Always call fetchPosts — allow guests to see posts
+    
     fetchPosts();
+
+    // Keep retrying every 5 seconds until it works
+    intervalId = setInterval(fetchPosts, 5000);
+
+    return () => clearInterval(intervalId);
   }, [dispatch, userInfo]);
 
-
   if (isLoading) return <p>Loading...</p>;
-  
-  return(
+
+  return (
     <div className="flex justify-around">
       <LeftSideBar />
       <div className="bg-gray-100 w-full min-h-screen ">
         <div className="flex flex-col ">
           <div className="flex flex-col items-center gap-5">
-            {/* <UserPreview id={"680f6421f33116cabec2f563"} profile={"https://img.pokemondb.net/sprites/sword-shield/normal/charizard.png"} username={"testJoshua2"} bio={"testJoshua2"} followers={0} following={0} verified={false}/> */}
-            {/* {(!posts || posts.length === 0) && <Label className="text-gray-200">No Post Yet.........</Label>} */}
             {posts && posts.map((post: Post) => (
               <PostPreview
                 key={post._id}
