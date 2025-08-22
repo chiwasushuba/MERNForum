@@ -23,7 +23,7 @@ export default function ChatPage() {
   useEffect(() => {
     if (!authIsReady || !userInfo) return;
 
-    const s = io(process.env.NEXT_PUBLIC_SOCKET_URL, {
+    const s = io(process.env.NEXT_PUBLIC_API_URL, {
       transports: ['websocket'],
     });
 
