@@ -4,7 +4,7 @@ const mongoose = require("mongoose")
 const User = require("../models/userModel")
 const jwt= require("jsonwebtoken")
 const Post = require("../models/postModel")
-const { bucket } = require("../utils/firebase");
+const { s3Upload } = require("../utils/s3Upload");
 
 
 
@@ -98,66 +98,35 @@ const updateUser = async (req, res) => {
   try {
     let imageUrl = "";
 
-    // Handle image upload if file is present
+    // If a new file is uploaded, push to S3
     if (req.file) {
-      const fileName = `${id}/${Date.now()}-${req.file.originalname}`;
-      const blob = bucket.file(fileName);
-
-      const blobStream = blob.createWriteStream({
-        metadata: {
-          contentType: req.file.mimetype,
-        },
-      });
-
-      await new Promise((resolve, reject) => {
-        blobStream.on("error", (error) => reject(error));
-        blobStream.on("finish", async () => {
-          try {
-            await blob.makePublic();
-            imageUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
-            resolve();
-          } catch (err) {
-            reject(err);
-          }
-        });
-
-        blobStream.end(req.file.buffer);
-      });
+      imageUrl = await s3Upload(req.file, id);
     }
 
-    // If Multer added a file validation error
     if (req.fileValidationError) {
       return res.status(400).json({ error: req.fileValidationError });
     }
 
-    // Prepare the update object
-    const updateData = {
-      ...req.body,
-    };
-
-    // Only set image field if a new image was uploaded
+    const updateData = { ...req.body };
     if (imageUrl) {
       updateData.profile = imageUrl;
     }
 
-    // Update user
-    const user = await User.findOneAndUpdate(
-      { _id: id },
-      updateData,
-      { new: true } // <-- return the updated document
-    );
+    const user = await User.findOneAndUpdate({ _id: id }, updateData, {
+      new: true,
+    });
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    res.status(200).json({updatedData: updateData});
-
+    res.status(200).json({ updatedData: updateData });
   } catch (error) {
     console.error(error);
     res.status(400).json({ error: error.message });
   }
 };
+
 
 // gets all the posts of the user
 const getUserPosts = async (req ,res) => {
