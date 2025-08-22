@@ -17,6 +17,7 @@ import { useCreatePost } from "../hooks/useCreatePost"
 import { Textarea } from './ui/textarea'
 import { motion } from 'framer-motion'
 import imageCompression from 'browser-image-compression';
+import { useAuthContext } from '@/hooks/useAuthContext'
 
 interface AddPostDivProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -30,6 +31,7 @@ const AddPostDiv = ({ setIsOpen } : AddPostDivProps) => {
   const [imagePreview, setImagePreview] = useState('') // Added for image preview
   const { createPost, isLoading } = useCreatePost()
   const [openImageBtn, setIsOpenImageBtn] = useState(false)
+  const {userInfo} = useAuthContext();
 
   // Handles memory leak
   useEffect(() => {
@@ -51,10 +53,16 @@ const AddPostDiv = ({ setIsOpen } : AddPostDivProps) => {
         maxWidthOrHeight: 800,
         useWebWorker: true,
       };
-  
+
       try {
-        const compressedFile = await imageCompression(file, options);
-        setCompressedImage(compressedFile); // save compressed image to state
+        const compressedBlob = await imageCompression(file, options);
+
+        const compressedFile = new File([compressedBlob], file.name, {
+          type: file.type,
+          lastModified: Date.now(),
+        });
+
+        setImage(compressedFile); 
         const previewUrl = URL.createObjectURL(compressedFile);
         setImagePreview(previewUrl);
       } catch (error) {
@@ -63,22 +71,27 @@ const AddPostDiv = ({ setIsOpen } : AddPostDivProps) => {
     }
   };
 
+
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); // Added to prevent default form submission
+    e.preventDefault(); 
     e.stopPropagation()
     
     if (!title.trim() || !content.trim()) {
       return alert("Title and content are required!")
     }
 
+    if (!userInfo || !userInfo.token) {
+      return alert("You must be logged in to create a post!");
+    }
+
     try {
       // Pass the actual file object to createPost
-      const response = await createPost(title, content, compressedImage)
+      const response = await createPost(title, content, image)
 
       console.log(response?.status)
 
       // Reset form after successful submission
-      if (response && response.status == 200){
+      if (response?.status == 201){
         alert("Successfully posted a post")
         setTitle('')
         setContent('')
@@ -96,9 +109,12 @@ const AddPostDiv = ({ setIsOpen } : AddPostDivProps) => {
 
   // Function to remove selected image
   const removeImage = () => {
-    setImage(null)
-    setImagePreview('')
-  }
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview); // release memory
+    }
+    setImage(null);
+    setImagePreview('');
+  };
 
   return (
     <motion.div 

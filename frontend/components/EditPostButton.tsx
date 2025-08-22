@@ -21,7 +21,7 @@ export default function EditPostEvent({ postId, isOpen, setIsOpen }: EditPostEve
     const [newPhoto, setNewPhoto] = useState('');
     const [newTags, setNewTags] = useState<string[]>([]);
     const [tagInput, setTagInput] = useState('');
-    const userData = sessionStorage.getItem('user');
+    const userData = localStorage.getItem('user');
     const token = userData ? JSON.parse(userData).token : null;
     const [showVideoInput, setShowVideoInput] = useState(false)
     const [showPhotoInput, setShowPhotoInput] = useState(false)
